@@ -32,9 +32,7 @@ const postActions = {
       dataType: 'json',
       success: (result) => {
         $("#admin-post-edit-modal").modal('hide');
-        window
-          .location
-          .reload();
+        window.location.reload();
       },
       error: (result) => {
         if (typeof result.responseJSON.message === 'string') {
