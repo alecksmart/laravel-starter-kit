@@ -22,6 +22,8 @@ Latest Laravel blog boilerplate starter kit application.
 
 ```bash
 # preapre all
+$ git clone https://github.com/alecksmart/laravel-starter-kit.git
+$ cd laravel-starter-kit
 $ composer install
 $ npm install
 ```
