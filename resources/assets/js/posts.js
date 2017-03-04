@@ -1,5 +1,4 @@
-const modalSpinner = '<div class="centered"><i class="fa fa-spinner fa-spin" style="font-size:24px"></' +
-    'i></div>';
+const modalSpinner = '<div class="centered"><i class="fa fa-spinner fa-spin" style="font-size:24px"></i></div>';
 
 const postActions = {
 
