@@ -26,7 +26,7 @@ class PostsController extends Controller
             return redirect('/login');
         }
 
-        if($filter = $request->get('filter')){
+        if ($filter = $request->get('filter')) {
             $posts = Post::withTrashed()
                 ->where('post_title', 'LIKE', sprintf('%%%s%%', trim($filter)))
                 ->orWhere('post_body', 'LIKE', sprintf('%%%s%%', trim($filter)))
@@ -34,8 +34,7 @@ class PostsController extends Controller
                 ->orderBy('created_at', 'DESC')
                 ->paginate(Config::get('constants.PAGINATE_RECORDS_PER_PAGE'))
                 ->appends(['filter' => $request->get('filter')]);
-        }
-        else {
+        } else {
             $posts = Post::withTrashed()
                 ->orderBy('updated_at', 'DESC')
                 ->orderBy('created_at', 'DESC')
@@ -260,7 +259,8 @@ class PostsController extends Controller
      * @param  Illuminate\Http\Request $request
      * @param  \App\Post $post
      */
-     public function approve(Request $request, Post $post){
+    public function approve(Request $request, Post $post)
+    {
 
         if (!Auth::check()) {
             abort(404);
@@ -275,10 +275,8 @@ class PostsController extends Controller
         $code = 200;
 
         try {
-
             $post->is_approved = $request->get('flag');
             $post->save();
-
         } catch (Exception $e) {
             $success = false;
             $message =  $e->getMessage();
@@ -286,9 +284,8 @@ class PostsController extends Controller
         }
 
         return response()->json([
-                'success' => $success,
-                'message' => $message
-            ], $code);
-     }
-
+              'success' => $success,
+              'message' => $message
+          ], $code);
+    }
 }
