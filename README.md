@@ -13,7 +13,6 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 
 # ToDo
 
-- [ ] Live reload
 - [ ] Unit testing
 - [ ] rocketeer
 
@@ -37,6 +36,8 @@ $ npm install
 $ php artisan migrate --seed
 #   or
 $ php artisan migrate:refresh --seed
+# for development, in another console
+$ gulp watch
 # finally:
 $ php artisan serve
 ```
