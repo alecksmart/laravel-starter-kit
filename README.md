@@ -37,6 +37,7 @@ $ npm install
 $ php artisan migrate --seed
 #   or
 $ php artisan migrate:refresh --seed
+# finally:
 $ php artisan serve
 ```
 
