@@ -8,7 +8,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 * MySQL migrations
 * Bootstrap, jQuery
 * Users, auth and roles
-* User profiel page and avatar upload
+* User profile page and avatar upload
 * Posts, comments, users CRUD
 
 # ToDo
