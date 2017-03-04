@@ -25,12 +25,17 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 # Install
 
 ```bash
+# get it
 $ git clone https://github.com/alecksmart/laravel-starter-kit.git
+# edit config
 $ cd laravel-starter-kit
+$ vim config/database.php
+# install
 $ composer install
 $ npm install
+# run
 $ php artisan migrate --seed
-# or
+#   or
 $ php artisan migrate:refresh --seed
 $ php artisan serve
 ```
