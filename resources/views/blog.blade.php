@@ -5,7 +5,7 @@
 <div class="container">
 
     <h1>Welcome to the Blog</h1>
-    <p class="lead">Basic blog boilerplate.</p>
+    <p class="lead">A basic blog boilerplate</p>
 
     <div class="posts">
         <div class="container">

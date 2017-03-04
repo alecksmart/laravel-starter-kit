@@ -5,7 +5,7 @@
 <div class="container">
 
     <h1>Welcome to the Blog</h1>
-    <p class="lead">Basic blog for test task 3.</p>
+    <p class="lead">A basic blog boilerplate</p>
     <p>
         <a href="/">back to posts list</a>
     </p>
