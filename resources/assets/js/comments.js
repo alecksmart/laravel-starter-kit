@@ -52,8 +52,8 @@ const commentActions = {
           $("#admin-comment-edit-modal .modal-body").html(htmlSaved);
           $.each(result.responseJSON.message, (i, v) =>
           {
-            $("#admin-comment-edit-modal .modal-body .form-errors").append('<div class="alert alert-danger">'
-              + v + '</div>');
+            $("#admin-comment-edit-modal .modal-body .form-errors").append('<div class="alert alert-danger">' +
+              v + '</div>');
           });
         }
       }
