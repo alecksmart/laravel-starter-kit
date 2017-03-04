@@ -1,5 +1,6 @@
 # laravel-starter-kit
-Latest Laravel blog boilerplate starter kit application.
+
+Latest Laravel blog boilerplate starter kit application. A very basic set of features for easy start developing a new application.
 
 # Features
 
@@ -7,6 +8,7 @@ Latest Laravel blog boilerplate starter kit application.
 * MySQL migrations
 * Bootstrap, jQuery
 * Users, auth and roles
+* User avatar upload
 * Posts, comments, users CRUD
 
 # ToDo
@@ -23,7 +25,6 @@ Latest Laravel blog boilerplate starter kit application.
 # Install
 
 ```bash
-# preapre all
 $ git clone https://github.com/alecksmart/laravel-starter-kit.git
 $ cd laravel-starter-kit
 $ composer install
