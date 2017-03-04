@@ -33,4 +33,4 @@ $ php artisan migrate:refresh --seed
 
 # Notes
 
-We will try to keep this up-to-date. At the momemnt of writing, the latest Laravel version is 5.4.
+We will try to keep this up-to-date. At the moment of writing, the latest Laravel version is 5.4.
