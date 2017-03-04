@@ -1,6 +1,16 @@
 vendor/
 node_modules/
 
+public/storage
+public/images
+public/hot
+storage/*.key
+.idea
+Homestead.json
+Homestead.yaml
+.env
+.code
+
 # Laravel 4 specific
 bootstrap/compiled.php
 app/storage/
