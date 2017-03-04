@@ -12,7 +12,7 @@ Homestead.yaml
 .env
 .vscode
 
-.php_cs
+.php_cs.cache
 
 # Laravel 4 specific
 bootstrap/compiled.php

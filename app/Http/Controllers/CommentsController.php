@@ -65,7 +65,6 @@ class CommentsController extends Controller
      */
     public function store(Request $request)
     {
-
         $post = Post::find($request->get('post_id'));
         $user = Auth::user();
 
@@ -79,10 +78,10 @@ class CommentsController extends Controller
         ]);
 
         $comment = new Comment();
-            $comment->user_id = $user->id;
-            $comment->post_id = $post->id;
-            $comment->comment_body = $request->get('comment_body');
-            $comment->created_at = new \DateTime();
+        $comment->user_id = $user->id;
+        $comment->post_id = $post->id;
+        $comment->comment_body = $request->get('comment_body');
+        $comment->created_at = new \DateTime();
         $comment->save();
 
         return Redirect::back();
@@ -212,7 +211,6 @@ class CommentsController extends Controller
      */
     public function unhide(Request $request)
     {
-
         if (!Auth::check()) {
             abort(404);
         }
