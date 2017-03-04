@@ -20,6 +20,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 
  * npm
  * composer
+ * gulp
 
 # Install
 
