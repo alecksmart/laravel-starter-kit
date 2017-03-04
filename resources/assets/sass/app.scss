@@ -1,0 +1,23 @@
+
+// Fonts
+@import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
+
+// Variables
+@import "variables";
+
+// Bootstrap
+@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+
+
+// Custom stuff
+
+.centered {
+    text-align: center;
+}
+.searchbox {
+    float:right;
+    width:240px;
+}
+.searchbox .form-control input {
+    width:240px;
+}
