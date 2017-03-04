@@ -9,7 +9,7 @@ storage/*.key
 Homestead.json
 Homestead.yaml
 .env
-.code
+.vscode
 
 # Laravel 4 specific
 bootstrap/compiled.php
