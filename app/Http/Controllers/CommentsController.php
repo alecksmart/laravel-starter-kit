@@ -29,7 +29,7 @@ class CommentsController extends Controller
 
         if ($filter = $request->get('filter')) {
             $comments = Comment::withTrashed()
-                ->where('comment_body', 'LIKE', sprintf('%%%s%%', trim($filter))
+                ->where('comment_body', 'LIKE', sprintf('%%%s%%', trim($filter)))
                 ->orderBy('updated_at', 'DESC')
                 ->orderBy('created_at', 'DESC')
                 ->paginate(Config::get('constants.PAGINATE_RECORDS_PER_PAGE'))
