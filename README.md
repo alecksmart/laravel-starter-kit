@@ -5,7 +5,7 @@ Latest Laravel blog boilerplate starter kit application.
 
 * Laravel
 * MySQL migrations
-* jQuery
+* Bootstrap, jQuery
 * Users, auth and roles
 * Posts, comments, users CRUD
 
