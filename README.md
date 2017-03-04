@@ -6,6 +6,8 @@ Latest Laravel blog boilerplate starter kit application.
 * Laravel
 * MySQL migrations
 * jQuery
+* Users, auth and roles
+* Posts, comments, users CRUD
 
 # ToDo
 
@@ -29,6 +31,7 @@ $ npm install
 $ php artisan migrate --seed
 # or
 $ php artisan migrate:refresh --seed
+$ php artisan serve
 ```
 
 # Notes
