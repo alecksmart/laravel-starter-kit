@@ -12,6 +12,8 @@ Homestead.yaml
 .env
 .vscode
 
+.php_cs
+
 # Laravel 4 specific
 bootstrap/compiled.php
 app/storage/
