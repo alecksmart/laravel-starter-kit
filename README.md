@@ -26,6 +26,9 @@ $ git clone https://github.com/alecksmart/laravel-starter-kit.git
 $ cd laravel-starter-kit
 $ composer install
 $ npm install
+$ php artisan migrate --seed
+# or
+$ php artisan migrate:refresh --seed
 ```
 
 # Notes
