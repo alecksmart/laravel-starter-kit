@@ -14,6 +14,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 # ToDo
 
 - [ ] Gates and policies
+- [ ] Beautiful users, posts, comments CRUD with AJAX
 - [ ] Unit testing
 - [ ] rocketeer
 
@@ -37,9 +38,9 @@ $ vim .env
 # install
 $ composer install
 $ npm install
-# run
 $ php artisan key:generate
 $ php artisan config:clear
+# run
 $ php artisan migrate --seed
 #   or
 $ php artisan migrate:refresh --seed
