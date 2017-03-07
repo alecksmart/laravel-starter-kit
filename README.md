@@ -13,7 +13,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 
 # ToDo
 
-- [ ] Gates and policies
+- [ ] Gates and policies with bouncer
 - [ ] Beautiful users, posts, comments CRUD with AJAX
 - [ ] Unit testing
 - [ ] rocketeer
