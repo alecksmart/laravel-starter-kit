@@ -1,6 +1,6 @@
 # laravel-starter-kit
 
-Latest Laravel blog boilerplate starter kit application. A very basic set of features for easy start developing a new application.
+Latest Laravel blog boilerplate starter kit application. A very basic set of features for easy start developing a new application. Education purposes only.
 
 # Features
 
