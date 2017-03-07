@@ -13,7 +13,6 @@
         "laravel/tinker": "~1.0"
     },
     "require-dev": {
-        "felixfbecker/language-server": "^4.3",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~5.7",
