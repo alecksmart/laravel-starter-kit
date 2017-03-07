@@ -10,6 +10,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 * Users, auth and roles
 * User profile page and avatar upload
 * Posts, comments, users CRUD
+* Users CRUD
 
 # ToDo
 
