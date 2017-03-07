@@ -13,6 +13,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 
 # ToDo
 
+- [ ] Gates and policies
 - [ ] Unit testing
 - [ ] rocketeer
 
