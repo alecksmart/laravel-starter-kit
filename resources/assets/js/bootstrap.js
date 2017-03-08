@@ -22,7 +22,6 @@ window.Vue = require('vue');
  * We will need Vue's $http...
  */
 require('vue-resource');
-
 window.Vue.http.headers.common['X-CSRF-TOKEN'] = window.Laravel.csrfToken;
 window.Vue.http.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
