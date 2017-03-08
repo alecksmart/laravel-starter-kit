@@ -14,14 +14,14 @@
   <!-- New Item Controls  -->
 
   <div class="pull-right">
-    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#create-item"> New User </button>
+    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#create-item"><span class="glyphicon glyphicon-new-window"></span> New </button>
   </div>
 
   <!-- Item Listing -->
 
   <div class="card">
     <div class="card-header"><i class="fa fa-align-justify"></i>
-      Users List
+      List of Users
     </div>
     <div class="card-block">
       <table class="table">
