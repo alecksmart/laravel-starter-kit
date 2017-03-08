@@ -69,11 +69,15 @@ class UserManagerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
+        $rules = [
             'name'     => 'required|max:100',
             'email'    => 'required|max:100|email|unique:users',
-            'password' => 'required|max:100',
-        ]);
+        ];
+        // validate password if it arrives
+        if ($request->get('password')) {
+            $rules['password'] = 'required|max:100';
+        }
+        $this->validate($request, $rules);
 
         $edit = User::find($id)->update($request->all());
         return response()->json($edit);

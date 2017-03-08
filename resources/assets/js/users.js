@@ -86,9 +86,12 @@ window._managers.usersManager = () => {
         });
       },
       editItem: function (item) {
-        this.fillItem.title = item.title;
+        this.fillItem = {};
         this.fillItem.id = item.id;
-        this.fillItem.description = item.description;
+        this.fillItem.name = item.name;
+        this.fillItem.email = item.email;
+        this.fillItem.password = item.password;
+        console.log(this.fillItem);
         $("#edit-item").modal('show');
       },
       updateItem: function (id) {
@@ -96,9 +99,10 @@ window._managers.usersManager = () => {
         this.$http.put('/manage/users/' + id, input).then((response) => {
           this.changePage(this.pagination.current_page);
           this.fillItem = {
-            'title': '',
-            'description': '',
-            'id': ''
+            'id': '',
+            'name': '',
+            'email': '',
+            'password': ''
           };
           $("#edit-item").modal('hide');
           toastr.success('Item Updated Successfully.', 'Success Alert', {

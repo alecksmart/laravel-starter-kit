@@ -121,6 +121,11 @@
             </div>
 
             <div class="form-group">
+              <label for="password">Password (leave blank for no change):</label>
+              <input type="text" name="password" class="form-control" v-model="fillItem.password" /> <span v-if="formErrorsUpdate['password']" class="error text-danger">@{{ formErrorsUpdate['password'] }}</span>
+            </div>
+
+            <div class="form-group">
               <button type="submit" class="btn btn-success">Submit</button>
             </div>
           </form>
