@@ -4,9 +4,17 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserManagerController extends Controller
 {
+    /**
+     * All all actions require a user 1to be logged in...
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     /**
      * Display a listing placeholder of the resource.
@@ -69,18 +77,29 @@ class UserManagerController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $currentUser = $request->user();
+        $user = User::find($id);
+
+        if ($currentUser->id == $user->id) {
+            // 403 - unauthorized action
+            return response()->json(['_common' => ['You cannot edit yourself, period.']], 403);
+        }
+
         $rules = [
-            'name'     => 'required|max:100',
-            'email'    => 'required|max:100|email|unique:users',
+            'name'     => 'required|max:100'
         ];
+        // validate email change
+        if ($request->get('email') !== $user->email) {
+            $rules['email'] = 'required|max:100|email|unique:users';
+        }
         // validate password if it arrives
         if ($request->get('password')) {
             $rules['password'] = 'required|max:100';
         }
         $this->validate($request, $rules);
 
-        $edit = User::find($id)->update($request->all());
-        return response()->json($edit);
+        $user->update($request->all());
+        return response()->json($user);
     }
 
     /**

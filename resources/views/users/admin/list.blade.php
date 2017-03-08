@@ -107,8 +107,13 @@
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
           <h4 class="modal-title" id="myModalLabel">Edit</h4> </div>
+
         <div class="modal-body">
           <form method="POST" enctype="multipart/form-data" v-on:submit.prevent="updateItem(fillItem.id)">
+
+            <p v-if="formErrorsUpdate['_common']">
+              <span class="error text-danger">@{{ formErrorsUpdate['_common'] }}</span>
+            </p>
 
             <div class="form-group">
               <label for="name">Name:</label>

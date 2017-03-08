@@ -1,6 +1,8 @@
 /**
  * @todo load on demand for the page from blade stack
  */
+
+const toastr = require('toastr');
 window._managers.usersManager = () => {
   new Vue({
     el: '#manage-vue',
@@ -55,7 +57,6 @@ window._managers.usersManager = () => {
     },
     methods: {
       getVueItems: function (page) {
-        //console.log(this)
         this.$http.get('/manage/users?page=' + page).then((response) => {
           this.$set('items', response.data.data.data);
           this.$set('pagination', response.data.pagination);
@@ -87,11 +88,11 @@ window._managers.usersManager = () => {
       },
       editItem: function (item) {
         this.fillItem = {};
+        this.formErrorsUpdate = {};
         this.fillItem.id = item.id;
         this.fillItem.name = item.name;
         this.fillItem.email = item.email;
         this.fillItem.password = item.password;
-        console.log(this.fillItem);
         $("#edit-item").modal('show');
       },
       updateItem: function (id) {
