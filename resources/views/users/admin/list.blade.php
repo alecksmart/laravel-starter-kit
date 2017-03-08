@@ -88,4 +88,13 @@
   </div>
 </div>
 
+@push('scripts')
+<script>
+  $(document).ready(function(){
+    window._managers.usersManager
+      && window._managers.usersManager();
+  });
+</script>
+@endpush
+
 @endsection
