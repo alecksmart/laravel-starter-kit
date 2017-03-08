@@ -1,8 +1,11 @@
 <ul class="dropdown-menu" role="menu">
     <li><a href="/home">Dashboard</a></li>
+    @can('manage-users-list')
+        <li><a href="/manage/users">Manage Users</a></li>
+    @endcan
     <li><a href="/myaccount">My Account</a></li>
-    <li><a href="/posts">List of Posts</a></li>
-    <li><a href="/comments">List of Comments</a></li>
+    <!--li><a href="/posts">List of Posts</a></li>
+    <li><a href="/comments">List of Comments</a></li-->
     <li>
         <a href="{{ route('logout') }}"
             onclick="event.preventDefault();
