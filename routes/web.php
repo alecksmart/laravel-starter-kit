@@ -27,6 +27,7 @@ Route::post('/myaccount', 'UsersController@save');
 Route::post('/user/avatar', 'UsersController@avatar');
 
 // Manage usesr
+Route::get('/manage/users/list', 'UserManagerController@list');
 Route::resource('/manage/users', 'UserManagerController');
 
 

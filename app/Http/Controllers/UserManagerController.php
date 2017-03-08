@@ -7,6 +7,17 @@ use Illuminate\Http\Request;
 
 class UserManagerController extends Controller
 {
+
+    /**
+     * Display a listing placeholder of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function list()
+    {
+        return view('users.admin.list');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,17 +25,21 @@ class UserManagerController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $items = User::latest()->paginate(5);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $response = [
+            'pagination' => [
+                'total'        => $items->total(),
+                'per_page'     => $items->perPage(),
+                'current_page' => $items->currentPage(),
+                'last_page'    => $items->lastPage(),
+                'from'         => $items->firstItem(),
+                'to'           => $items->lastItem()
+            ],
+            'data' => $items
+        ];
+
+        return response()->json($response);
     }
 
     /**
@@ -35,51 +50,44 @@ class UserManagerController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $this->validate($request, [
+            'name'     => 'required|max:100',
+            'email'    => 'required|max:100|email|unique:users',
+            'password' => 'required|max:100',
+        ]);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function show(User $user)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(User $user)
-    {
-        //
+        $create = User::create($request->all());
+        return response()->json($create);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\User  $user
+     * @param  int  $id user id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'name'     => 'required|max:100',
+            'email'    => 'required|max:100|email|unique:users',
+            'password' => 'required|max:100',
+        ]);
+
+        $edit = User::find($id)->update($request->all());
+        return response()->json($edit);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\User  $user
+     * @param  int  $id user id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        //
+        User::find($id)->delete();
+        return response()->json(['done']);
     }
 }

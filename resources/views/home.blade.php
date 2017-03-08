@@ -9,7 +9,7 @@
                 <div class="panel-body">
                     <ul>
                         @can('manage-users-list')
-                            <li><a href="/manage/users">Manage Users</a></li>
+                            <li><a href="/manage/users/list">Manage Users</a></li>
                         @endcan
                         <li><a href="/myaccount">My Account</a></li>
                         <!--li><a href="/posts">List of Post</a></li>
