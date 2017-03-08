@@ -11900,7 +11900,7 @@ Polling.prototype.uri = function () {
 
 }).apply(this, arguments);
 
-},{"../transport":189,"component-inherit":185,"debug":197,"engine.io-parser":199,"parseqs":210,"xmlhttprequest-ssl":195,"yeast":230}],194:[function(require,module,exports){
+},{"../transport":189,"component-inherit":185,"debug":197,"engine.io-parser":199,"parseqs":210,"xmlhttprequest-ssl":195,"yeast":231}],194:[function(require,module,exports){
 _hmr["websocket:null"].initModule("node_modules/engine.io-client/lib/transports/websocket.js", module);
 (function(){
 (function (global){
@@ -12193,7 +12193,7 @@ WS.prototype.check = function () {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 }).apply(this, arguments);
 
-},{"../transport":189,"component-inherit":185,"debug":197,"engine.io-parser":199,"parseqs":210,"ws":33,"yeast":230}],195:[function(require,module,exports){
+},{"../transport":189,"component-inherit":185,"debug":197,"engine.io-parser":199,"parseqs":210,"ws":33,"yeast":231}],195:[function(require,module,exports){
 _hmr["websocket:null"].initModule("node_modules/engine.io-client/lib/xmlhttprequest.js", module);
 (function(){
 (function (global){
@@ -13415,7 +13415,7 @@ exports.decodePayloadAsBinary = function (data, binaryType, callback) {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 }).apply(this, arguments);
 
-},{"./keys":200,"after":2,"arraybuffer.slice":3,"base64-arraybuffer":30,"blob":31,"has-binary":201,"wtf-8":229}],200:[function(require,module,exports){
+},{"./keys":200,"after":2,"arraybuffer.slice":3,"base64-arraybuffer":30,"blob":31,"has-binary":201,"wtf-8":230}],200:[function(require,module,exports){
 _hmr["websocket:null"].initModule("node_modules/engine.io-parser/lib/keys.js", module);
 (function(){
 
@@ -45137,6 +45137,1540 @@ function toArray(list, index) {
 }).apply(this, arguments);
 
 },{}],228:[function(require,module,exports){
+_hmr["websocket:null"].initModule("node_modules/vue-resource/dist/vue-resource.common.js", module);
+(function(){
+/*!
+ * vue-resource v1.2.1
+ * https://github.com/pagekit/vue-resource
+ * Released under the MIT License.
+ */
+
+'use strict';
+
+/**
+ * Promises/A+ polyfill v1.1.4 (https://github.com/bramstein/promis)
+ */
+
+var RESOLVED = 0;
+var REJECTED = 1;
+var PENDING  = 2;
+
+function Promise$1(executor) {
+
+    this.state = PENDING;
+    this.value = undefined;
+    this.deferred = [];
+
+    var promise = this;
+
+    try {
+        executor(function (x) {
+            promise.resolve(x);
+        }, function (r) {
+            promise.reject(r);
+        });
+    } catch (e) {
+        promise.reject(e);
+    }
+}
+
+Promise$1.reject = function (r) {
+    return new Promise$1(function (resolve, reject) {
+        reject(r);
+    });
+};
+
+Promise$1.resolve = function (x) {
+    return new Promise$1(function (resolve, reject) {
+        resolve(x);
+    });
+};
+
+Promise$1.all = function all(iterable) {
+    return new Promise$1(function (resolve, reject) {
+        var count = 0, result = [];
+
+        if (iterable.length === 0) {
+            resolve(result);
+        }
+
+        function resolver(i) {
+            return function (x) {
+                result[i] = x;
+                count += 1;
+
+                if (count === iterable.length) {
+                    resolve(result);
+                }
+            };
+        }
+
+        for (var i = 0; i < iterable.length; i += 1) {
+            Promise$1.resolve(iterable[i]).then(resolver(i), reject);
+        }
+    });
+};
+
+Promise$1.race = function race(iterable) {
+    return new Promise$1(function (resolve, reject) {
+        for (var i = 0; i < iterable.length; i += 1) {
+            Promise$1.resolve(iterable[i]).then(resolve, reject);
+        }
+    });
+};
+
+var p$1 = Promise$1.prototype;
+
+p$1.resolve = function resolve(x) {
+    var promise = this;
+
+    if (promise.state === PENDING) {
+        if (x === promise) {
+            throw new TypeError('Promise settled with itself.');
+        }
+
+        var called = false;
+
+        try {
+            var then = x && x['then'];
+
+            if (x !== null && typeof x === 'object' && typeof then === 'function') {
+                then.call(x, function (x) {
+                    if (!called) {
+                        promise.resolve(x);
+                    }
+                    called = true;
+
+                }, function (r) {
+                    if (!called) {
+                        promise.reject(r);
+                    }
+                    called = true;
+                });
+                return;
+            }
+        } catch (e) {
+            if (!called) {
+                promise.reject(e);
+            }
+            return;
+        }
+
+        promise.state = RESOLVED;
+        promise.value = x;
+        promise.notify();
+    }
+};
+
+p$1.reject = function reject(reason) {
+    var promise = this;
+
+    if (promise.state === PENDING) {
+        if (reason === promise) {
+            throw new TypeError('Promise settled with itself.');
+        }
+
+        promise.state = REJECTED;
+        promise.value = reason;
+        promise.notify();
+    }
+};
+
+p$1.notify = function notify() {
+    var promise = this;
+
+    nextTick(function () {
+        if (promise.state !== PENDING) {
+            while (promise.deferred.length) {
+                var deferred = promise.deferred.shift(),
+                    onResolved = deferred[0],
+                    onRejected = deferred[1],
+                    resolve = deferred[2],
+                    reject = deferred[3];
+
+                try {
+                    if (promise.state === RESOLVED) {
+                        if (typeof onResolved === 'function') {
+                            resolve(onResolved.call(undefined, promise.value));
+                        } else {
+                            resolve(promise.value);
+                        }
+                    } else if (promise.state === REJECTED) {
+                        if (typeof onRejected === 'function') {
+                            resolve(onRejected.call(undefined, promise.value));
+                        } else {
+                            reject(promise.value);
+                        }
+                    }
+                } catch (e) {
+                    reject(e);
+                }
+            }
+        }
+    });
+};
+
+p$1.then = function then(onResolved, onRejected) {
+    var promise = this;
+
+    return new Promise$1(function (resolve, reject) {
+        promise.deferred.push([onResolved, onRejected, resolve, reject]);
+        promise.notify();
+    });
+};
+
+p$1.catch = function (onRejected) {
+    return this.then(undefined, onRejected);
+};
+
+/**
+ * Promise adapter.
+ */
+
+if (typeof Promise === 'undefined') {
+    window.Promise = Promise$1;
+}
+
+function PromiseObj(executor, context) {
+
+    if (executor instanceof Promise) {
+        this.promise = executor;
+    } else {
+        this.promise = new Promise(executor.bind(context));
+    }
+
+    this.context = context;
+}
+
+PromiseObj.all = function (iterable, context) {
+    return new PromiseObj(Promise.all(iterable), context);
+};
+
+PromiseObj.resolve = function (value, context) {
+    return new PromiseObj(Promise.resolve(value), context);
+};
+
+PromiseObj.reject = function (reason, context) {
+    return new PromiseObj(Promise.reject(reason), context);
+};
+
+PromiseObj.race = function (iterable, context) {
+    return new PromiseObj(Promise.race(iterable), context);
+};
+
+var p = PromiseObj.prototype;
+
+p.bind = function (context) {
+    this.context = context;
+    return this;
+};
+
+p.then = function (fulfilled, rejected) {
+
+    if (fulfilled && fulfilled.bind && this.context) {
+        fulfilled = fulfilled.bind(this.context);
+    }
+
+    if (rejected && rejected.bind && this.context) {
+        rejected = rejected.bind(this.context);
+    }
+
+    return new PromiseObj(this.promise.then(fulfilled, rejected), this.context);
+};
+
+p.catch = function (rejected) {
+
+    if (rejected && rejected.bind && this.context) {
+        rejected = rejected.bind(this.context);
+    }
+
+    return new PromiseObj(this.promise.catch(rejected), this.context);
+};
+
+p.finally = function (callback) {
+
+    return this.then(function (value) {
+            callback.call(this);
+            return value;
+        }, function (reason) {
+            callback.call(this);
+            return Promise.reject(reason);
+        }
+    );
+};
+
+/**
+ * Utility functions.
+ */
+
+var ref = {};
+var hasOwnProperty = ref.hasOwnProperty;
+
+var ref$1 = [];
+var slice = ref$1.slice;
+var debug = false;
+var ntick;
+
+var inBrowser = typeof window !== 'undefined';
+
+var Util = function (ref) {
+    var config = ref.config;
+    var nextTick = ref.nextTick;
+
+    ntick = nextTick;
+    debug = config.debug || !config.silent;
+};
+
+function warn(msg) {
+    if (typeof console !== 'undefined' && debug) {
+        console.warn('[VueResource warn]: ' + msg);
+    }
+}
+
+function error(msg) {
+    if (typeof console !== 'undefined') {
+        console.error(msg);
+    }
+}
+
+function nextTick(cb, ctx) {
+    return ntick(cb, ctx);
+}
+
+function trim(str) {
+    return str ? str.replace(/^\s*|\s*$/g, '') : '';
+}
+
+function toLower(str) {
+    return str ? str.toLowerCase() : '';
+}
+
+function toUpper(str) {
+    return str ? str.toUpperCase() : '';
+}
+
+var isArray = Array.isArray;
+
+function isString(val) {
+    return typeof val === 'string';
+}
+
+
+
+function isFunction(val) {
+    return typeof val === 'function';
+}
+
+function isObject(obj) {
+    return obj !== null && typeof obj === 'object';
+}
+
+function isPlainObject(obj) {
+    return isObject(obj) && Object.getPrototypeOf(obj) == Object.prototype;
+}
+
+function isBlob(obj) {
+    return typeof Blob !== 'undefined' && obj instanceof Blob;
+}
+
+function isFormData(obj) {
+    return typeof FormData !== 'undefined' && obj instanceof FormData;
+}
+
+function when(value, fulfilled, rejected) {
+
+    var promise = PromiseObj.resolve(value);
+
+    if (arguments.length < 2) {
+        return promise;
+    }
+
+    return promise.then(fulfilled, rejected);
+}
+
+function options(fn, obj, opts) {
+
+    opts = opts || {};
+
+    if (isFunction(opts)) {
+        opts = opts.call(obj);
+    }
+
+    return merge(fn.bind({$vm: obj, $options: opts}), fn, {$options: opts});
+}
+
+function each(obj, iterator) {
+
+    var i, key;
+
+    if (isArray(obj)) {
+        for (i = 0; i < obj.length; i++) {
+            iterator.call(obj[i], obj[i], i);
+        }
+    } else if (isObject(obj)) {
+        for (key in obj) {
+            if (hasOwnProperty.call(obj, key)) {
+                iterator.call(obj[key], obj[key], key);
+            }
+        }
+    }
+
+    return obj;
+}
+
+var assign = Object.assign || _assign;
+
+function merge(target) {
+
+    var args = slice.call(arguments, 1);
+
+    args.forEach(function (source) {
+        _merge(target, source, true);
+    });
+
+    return target;
+}
+
+function defaults(target) {
+
+    var args = slice.call(arguments, 1);
+
+    args.forEach(function (source) {
+
+        for (var key in source) {
+            if (target[key] === undefined) {
+                target[key] = source[key];
+            }
+        }
+
+    });
+
+    return target;
+}
+
+function _assign(target) {
+
+    var args = slice.call(arguments, 1);
+
+    args.forEach(function (source) {
+        _merge(target, source);
+    });
+
+    return target;
+}
+
+function _merge(target, source, deep) {
+    for (var key in source) {
+        if (deep && (isPlainObject(source[key]) || isArray(source[key]))) {
+            if (isPlainObject(source[key]) && !isPlainObject(target[key])) {
+                target[key] = {};
+            }
+            if (isArray(source[key]) && !isArray(target[key])) {
+                target[key] = [];
+            }
+            _merge(target[key], source[key], deep);
+        } else if (source[key] !== undefined) {
+            target[key] = source[key];
+        }
+    }
+}
+
+/**
+ * Root Prefix Transform.
+ */
+
+var root = function (options$$1, next) {
+
+    var url = next(options$$1);
+
+    if (isString(options$$1.root) && !url.match(/^(https?:)?\//)) {
+        url = options$$1.root + '/' + url;
+    }
+
+    return url;
+};
+
+/**
+ * Query Parameter Transform.
+ */
+
+var query = function (options$$1, next) {
+
+    var urlParams = Object.keys(Url.options.params), query = {}, url = next(options$$1);
+
+    each(options$$1.params, function (value, key) {
+        if (urlParams.indexOf(key) === -1) {
+            query[key] = value;
+        }
+    });
+
+    query = Url.params(query);
+
+    if (query) {
+        url += (url.indexOf('?') == -1 ? '?' : '&') + query;
+    }
+
+    return url;
+};
+
+/**
+ * URL Template v2.0.6 (https://github.com/bramstein/url-template)
+ */
+
+function expand(url, params, variables) {
+
+    var tmpl = parse(url), expanded = tmpl.expand(params);
+
+    if (variables) {
+        variables.push.apply(variables, tmpl.vars);
+    }
+
+    return expanded;
+}
+
+function parse(template) {
+
+    var operators = ['+', '#', '.', '/', ';', '?', '&'], variables = [];
+
+    return {
+        vars: variables,
+        expand: function expand(context) {
+            return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function (_, expression, literal) {
+                if (expression) {
+
+                    var operator = null, values = [];
+
+                    if (operators.indexOf(expression.charAt(0)) !== -1) {
+                        operator = expression.charAt(0);
+                        expression = expression.substr(1);
+                    }
+
+                    expression.split(/,/g).forEach(function (variable) {
+                        var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
+                        values.push.apply(values, getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
+                        variables.push(tmp[1]);
+                    });
+
+                    if (operator && operator !== '+') {
+
+                        var separator = ',';
+
+                        if (operator === '?') {
+                            separator = '&';
+                        } else if (operator !== '#') {
+                            separator = operator;
+                        }
+
+                        return (values.length !== 0 ? operator : '') + values.join(separator);
+                    } else {
+                        return values.join(',');
+                    }
+
+                } else {
+                    return encodeReserved(literal);
+                }
+            });
+        }
+    };
+}
+
+function getValues(context, operator, key, modifier) {
+
+    var value = context[key], result = [];
+
+    if (isDefined(value) && value !== '') {
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            value = value.toString();
+
+            if (modifier && modifier !== '*') {
+                value = value.substring(0, parseInt(modifier, 10));
+            }
+
+            result.push(encodeValue(operator, value, isKeyOperator(operator) ? key : null));
+        } else {
+            if (modifier === '*') {
+                if (Array.isArray(value)) {
+                    value.filter(isDefined).forEach(function (value) {
+                        result.push(encodeValue(operator, value, isKeyOperator(operator) ? key : null));
+                    });
+                } else {
+                    Object.keys(value).forEach(function (k) {
+                        if (isDefined(value[k])) {
+                            result.push(encodeValue(operator, value[k], k));
+                        }
+                    });
+                }
+            } else {
+                var tmp = [];
+
+                if (Array.isArray(value)) {
+                    value.filter(isDefined).forEach(function (value) {
+                        tmp.push(encodeValue(operator, value));
+                    });
+                } else {
+                    Object.keys(value).forEach(function (k) {
+                        if (isDefined(value[k])) {
+                            tmp.push(encodeURIComponent(k));
+                            tmp.push(encodeValue(operator, value[k].toString()));
+                        }
+                    });
+                }
+
+                if (isKeyOperator(operator)) {
+                    result.push(encodeURIComponent(key) + '=' + tmp.join(','));
+                } else if (tmp.length !== 0) {
+                    result.push(tmp.join(','));
+                }
+            }
+        }
+    } else {
+        if (operator === ';') {
+            result.push(encodeURIComponent(key));
+        } else if (value === '' && (operator === '&' || operator === '?')) {
+            result.push(encodeURIComponent(key) + '=');
+        } else if (value === '') {
+            result.push('');
+        }
+    }
+
+    return result;
+}
+
+function isDefined(value) {
+    return value !== undefined && value !== null;
+}
+
+function isKeyOperator(operator) {
+    return operator === ';' || operator === '&' || operator === '?';
+}
+
+function encodeValue(operator, value, key) {
+
+    value = (operator === '+' || operator === '#') ? encodeReserved(value) : encodeURIComponent(value);
+
+    if (key) {
+        return encodeURIComponent(key) + '=' + value;
+    } else {
+        return value;
+    }
+}
+
+function encodeReserved(str) {
+    return str.split(/(%[0-9A-Fa-f]{2})/g).map(function (part) {
+        if (!/%[0-9A-Fa-f]/.test(part)) {
+            part = encodeURI(part);
+        }
+        return part;
+    }).join('');
+}
+
+/**
+ * URL Template (RFC 6570) Transform.
+ */
+
+var template = function (options) {
+
+    var variables = [], url = expand(options.url, options.params, variables);
+
+    variables.forEach(function (key) {
+        delete options.params[key];
+    });
+
+    return url;
+};
+
+/**
+ * Service for URL templating.
+ */
+
+function Url(url, params) {
+
+    var self = this || {}, options$$1 = url, transform;
+
+    if (isString(url)) {
+        options$$1 = {url: url, params: params};
+    }
+
+    options$$1 = merge({}, Url.options, self.$options, options$$1);
+
+    Url.transforms.forEach(function (handler) {
+        transform = factory(handler, transform, self.$vm);
+    });
+
+    return transform(options$$1);
+}
+
+/**
+ * Url options.
+ */
+
+Url.options = {
+    url: '',
+    root: null,
+    params: {}
+};
+
+/**
+ * Url transforms.
+ */
+
+Url.transforms = [template, query, root];
+
+/**
+ * Encodes a Url parameter string.
+ *
+ * @param {Object} obj
+ */
+
+Url.params = function (obj) {
+
+    var params = [], escape = encodeURIComponent;
+
+    params.add = function (key, value) {
+
+        if (isFunction(value)) {
+            value = value();
+        }
+
+        if (value === null) {
+            value = '';
+        }
+
+        this.push(escape(key) + '=' + escape(value));
+    };
+
+    serialize(params, obj);
+
+    return params.join('&').replace(/%20/g, '+');
+};
+
+/**
+ * Parse a URL and return its components.
+ *
+ * @param {String} url
+ */
+
+Url.parse = function (url) {
+
+    var el = document.createElement('a');
+
+    if (document.documentMode) {
+        el.href = url;
+        url = el.href;
+    }
+
+    el.href = url;
+
+    return {
+        href: el.href,
+        protocol: el.protocol ? el.protocol.replace(/:$/, '') : '',
+        port: el.port,
+        host: el.host,
+        hostname: el.hostname,
+        pathname: el.pathname.charAt(0) === '/' ? el.pathname : '/' + el.pathname,
+        search: el.search ? el.search.replace(/^\?/, '') : '',
+        hash: el.hash ? el.hash.replace(/^#/, '') : ''
+    };
+};
+
+function factory(handler, next, vm) {
+    return function (options$$1) {
+        return handler.call(vm, options$$1, next);
+    };
+}
+
+function serialize(params, obj, scope) {
+
+    var array = isArray(obj), plain = isPlainObject(obj), hash;
+
+    each(obj, function (value, key) {
+
+        hash = isObject(value) || isArray(value);
+
+        if (scope) {
+            key = scope + '[' + (plain || hash ? key : '') + ']';
+        }
+
+        if (!scope && array) {
+            params.add(value.name, value.value);
+        } else if (hash) {
+            serialize(params, value, key);
+        } else {
+            params.add(key, value);
+        }
+    });
+}
+
+/**
+ * XDomain client (Internet Explorer).
+ */
+
+var xdrClient = function (request) {
+    return new PromiseObj(function (resolve) {
+
+        var xdr = new XDomainRequest(), handler = function (ref) {
+            var type = ref.type;
+
+
+            var status = 0;
+
+            if (type === 'load') {
+                status = 200;
+            } else if (type === 'error') {
+                status = 500;
+            }
+
+            resolve(request.respondWith(xdr.responseText, {status: status}));
+        };
+
+        request.abort = function () { return xdr.abort(); };
+
+        xdr.open(request.method, request.getUrl());
+
+        if (request.timeout) {
+            xdr.timeout = request.timeout;
+        }
+
+        xdr.onload = handler;
+        xdr.onabort = handler;
+        xdr.onerror = handler;
+        xdr.ontimeout = handler;
+        xdr.onprogress = function () {};
+        xdr.send(request.getBody());
+    });
+};
+
+/**
+ * CORS Interceptor.
+ */
+
+var SUPPORTS_CORS = inBrowser && 'withCredentials' in new XMLHttpRequest();
+
+var cors = function (request, next) {
+
+    if (inBrowser) {
+
+        var orgUrl = Url.parse(location.href);
+        var reqUrl = Url.parse(request.getUrl());
+
+        if (reqUrl.protocol !== orgUrl.protocol || reqUrl.host !== orgUrl.host) {
+
+            request.crossOrigin = true;
+            request.emulateHTTP = false;
+
+            if (!SUPPORTS_CORS) {
+                request.client = xdrClient;
+            }
+        }
+    }
+
+    next();
+};
+
+/**
+ * Body Interceptor.
+ */
+
+var body = function (request, next) {
+
+    if (isFormData(request.body)) {
+
+        request.headers.delete('Content-Type');
+
+    } else if (isObject(request.body) || isArray(request.body)) {
+
+        if (request.emulateJSON) {
+            request.body = Url.params(request.body);
+            request.headers.set('Content-Type', 'application/x-www-form-urlencoded');
+        } else {
+            request.body = JSON.stringify(request.body);
+        }
+    }
+
+    next(function (response) {
+
+        Object.defineProperty(response, 'data', {
+
+            get: function get() {
+                return this.body;
+            },
+
+            set: function set(body) {
+                this.body = body;
+            }
+
+        });
+
+        return response.bodyText ? when(response.text(), function (text) {
+
+            var type = response.headers.get('Content-Type') || '';
+
+            if (type.indexOf('application/json') === 0 || isJson(text)) {
+
+                try {
+                    response.body = JSON.parse(text);
+                } catch (e) {
+                    response.body = null;
+                }
+
+            } else {
+                response.body = text;
+            }
+
+            return response;
+
+        }) : response;
+
+    });
+};
+
+function isJson(str) {
+
+    var start = str.match(/^\[|^\{(?!\{)/), end = {'[': /]$/, '{': /}$/};
+
+    return start && end[start[0]].test(str);
+}
+
+/**
+ * JSONP client (Browser).
+ */
+
+var jsonpClient = function (request) {
+    return new PromiseObj(function (resolve) {
+
+        var name = request.jsonp || 'callback', callback = request.jsonpCallback || '_jsonp' + Math.random().toString(36).substr(2), body = null, handler, script;
+
+        handler = function (ref) {
+            var type = ref.type;
+
+
+            var status = 0;
+
+            if (type === 'load' && body !== null) {
+                status = 200;
+            } else if (type === 'error') {
+                status = 500;
+            }
+
+            if (status && window[callback]) {
+                delete window[callback];
+                document.body.removeChild(script);
+            }
+
+            resolve(request.respondWith(body, {status: status}));
+        };
+
+        window[callback] = function (result) {
+            body = JSON.stringify(result);
+        };
+
+        request.abort = function () {
+            handler({type: 'abort'});
+        };
+
+        request.params[name] = callback;
+
+        if (request.timeout) {
+            setTimeout(request.abort, request.timeout);
+        }
+
+        script = document.createElement('script');
+        script.src = request.getUrl();
+        script.type = 'text/javascript';
+        script.async = true;
+        script.onload = handler;
+        script.onerror = handler;
+
+        document.body.appendChild(script);
+    });
+};
+
+/**
+ * JSONP Interceptor.
+ */
+
+var jsonp = function (request, next) {
+
+    if (request.method == 'JSONP') {
+        request.client = jsonpClient;
+    }
+
+    next();
+};
+
+/**
+ * Before Interceptor.
+ */
+
+var before = function (request, next) {
+
+    if (isFunction(request.before)) {
+        request.before.call(this, request);
+    }
+
+    next();
+};
+
+/**
+ * HTTP method override Interceptor.
+ */
+
+var method = function (request, next) {
+
+    if (request.emulateHTTP && /^(PUT|PATCH|DELETE)$/i.test(request.method)) {
+        request.headers.set('X-HTTP-Method-Override', request.method);
+        request.method = 'POST';
+    }
+
+    next();
+};
+
+/**
+ * Header Interceptor.
+ */
+
+var header = function (request, next) {
+
+    var headers = assign({}, Http.headers.common,
+        !request.crossOrigin ? Http.headers.custom : {},
+        Http.headers[toLower(request.method)]
+    );
+
+    each(headers, function (value, name) {
+        if (!request.headers.has(name)) {
+            request.headers.set(name, value);
+        }
+    });
+
+    next();
+};
+
+/**
+ * XMLHttp client (Browser).
+ */
+
+var SUPPORTS_BLOB = typeof Blob !== 'undefined' && typeof FileReader !== 'undefined';
+
+var xhrClient = function (request) {
+    return new PromiseObj(function (resolve) {
+
+        var xhr = new XMLHttpRequest(), handler = function (event) {
+
+            var response = request.respondWith(
+                'response' in xhr ? xhr.response : xhr.responseText, {
+                    status: xhr.status === 1223 ? 204 : xhr.status, // IE9 status bug
+                    statusText: xhr.status === 1223 ? 'No Content' : trim(xhr.statusText)
+                }
+            );
+
+            each(trim(xhr.getAllResponseHeaders()).split('\n'), function (row) {
+                response.headers.append(row.slice(0, row.indexOf(':')), row.slice(row.indexOf(':') + 1));
+            });
+
+            resolve(response);
+        };
+
+        request.abort = function () { return xhr.abort(); };
+
+        if (request.progress) {
+            if (request.method === 'GET') {
+                xhr.addEventListener('progress', request.progress);
+            } else if (/^(POST|PUT)$/i.test(request.method)) {
+                xhr.upload.addEventListener('progress', request.progress);
+            }
+        }
+
+        xhr.open(request.method, request.getUrl(), true);
+
+        if (request.timeout) {
+            xhr.timeout = request.timeout;
+        }
+
+        if (request.credentials === true) {
+            xhr.withCredentials = true;
+        }
+
+        if (!request.crossOrigin) {
+            request.headers.set('X-Requested-With', 'XMLHttpRequest');
+        }
+
+        if ('responseType' in xhr && SUPPORTS_BLOB) {
+            xhr.responseType = 'blob';
+        }
+
+        request.headers.forEach(function (value, name) {
+            xhr.setRequestHeader(name, value);
+        });
+
+        xhr.onload = handler;
+        xhr.onabort = handler;
+        xhr.onerror = handler;
+        xhr.ontimeout = handler;
+        xhr.send(request.getBody());
+    });
+};
+
+/**
+ * Http client (Node).
+ */
+
+var nodeClient = function (request) {
+
+    var client = require('got');
+
+    return new PromiseObj(function (resolve) {
+
+        var url = request.getUrl();
+        var body = request.getBody();
+        var method = request.method;
+        var headers = {}, handler;
+
+        request.headers.forEach(function (value, name) {
+            headers[name] = value;
+        });
+
+        client(url, {body: body, method: method, headers: headers}).then(handler = function (resp) {
+
+            var response = request.respondWith(resp.body, {
+                    status: resp.statusCode,
+                    statusText: trim(resp.statusMessage)
+                }
+            );
+
+            each(resp.headers, function (value, name) {
+                response.headers.set(name, value);
+            });
+
+            resolve(response);
+
+        }, function (error$$1) { return handler(error$$1.response); });
+    });
+};
+
+/**
+ * Base client.
+ */
+
+var Client = function (context) {
+
+    var reqHandlers = [sendRequest], resHandlers = [], handler;
+
+    if (!isObject(context)) {
+        context = null;
+    }
+
+    function Client(request) {
+        return new PromiseObj(function (resolve) {
+
+            function exec() {
+
+                handler = reqHandlers.pop();
+
+                if (isFunction(handler)) {
+                    handler.call(context, request, next);
+                } else {
+                    warn(("Invalid interceptor of type " + (typeof handler) + ", must be a function"));
+                    next();
+                }
+            }
+
+            function next(response) {
+
+                if (isFunction(response)) {
+
+                    resHandlers.unshift(response);
+
+                } else if (isObject(response)) {
+
+                    resHandlers.forEach(function (handler) {
+                        response = when(response, function (response) {
+                            return handler.call(context, response) || response;
+                        });
+                    });
+
+                    when(response, resolve);
+
+                    return;
+                }
+
+                exec();
+            }
+
+            exec();
+
+        }, context);
+    }
+
+    Client.use = function (handler) {
+        reqHandlers.push(handler);
+    };
+
+    return Client;
+};
+
+function sendRequest(request, resolve) {
+
+    var client = request.client || (inBrowser ? xhrClient : nodeClient);
+
+    resolve(client(request));
+}
+
+/**
+ * HTTP Headers.
+ */
+
+var Headers = function Headers(headers) {
+    var this$1 = this;
+
+
+    this.map = {};
+
+    each(headers, function (value, name) { return this$1.append(name, value); });
+};
+
+Headers.prototype.has = function has (name) {
+    return getName(this.map, name) !== null;
+};
+
+Headers.prototype.get = function get (name) {
+
+    var list = this.map[getName(this.map, name)];
+
+    return list ? list.join() : null;
+};
+
+Headers.prototype.getAll = function getAll (name) {
+    return this.map[getName(this.map, name)] || [];
+};
+
+Headers.prototype.set = function set (name, value) {
+    this.map[normalizeName(getName(this.map, name) || name)] = [trim(value)];
+};
+
+Headers.prototype.append = function append (name, value){
+
+    var list = this.map[getName(this.map, name)];
+
+    if (list) {
+        list.push(trim(value));
+    } else {
+        this.set(name, value);
+    }
+};
+
+Headers.prototype.delete = function delete$1 (name){
+    delete this.map[getName(this.map, name)];
+};
+
+Headers.prototype.deleteAll = function deleteAll (){
+    this.map = {};
+};
+
+Headers.prototype.forEach = function forEach (callback, thisArg) {
+        var this$1 = this;
+
+    each(this.map, function (list, name) {
+        each(list, function (value) { return callback.call(thisArg, value, name, this$1); });
+    });
+};
+
+function getName(map, name) {
+    return Object.keys(map).reduce(function (prev, curr) {
+        return toLower(name) === toLower(curr) ? curr : prev;
+    }, null);
+}
+
+function normalizeName(name) {
+
+    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+        throw new TypeError('Invalid character in header field name');
+    }
+
+    return trim(name);
+}
+
+/**
+ * HTTP Response.
+ */
+
+var Response = function Response(body, ref) {
+    var url = ref.url;
+    var headers = ref.headers;
+    var status = ref.status;
+    var statusText = ref.statusText;
+
+
+    this.url = url;
+    this.ok = status >= 200 && status < 300;
+    this.status = status || 0;
+    this.statusText = statusText || '';
+    this.headers = new Headers(headers);
+    this.body = body;
+
+    if (isString(body)) {
+
+        this.bodyText = body;
+
+    } else if (isBlob(body)) {
+
+        this.bodyBlob = body;
+
+        if (isBlobText(body)) {
+            this.bodyText = blobText(body);
+        }
+    }
+};
+
+Response.prototype.blob = function blob () {
+    return when(this.bodyBlob);
+};
+
+Response.prototype.text = function text () {
+    return when(this.bodyText);
+};
+
+Response.prototype.json = function json () {
+    return when(this.text(), function (text) { return JSON.parse(text); });
+};
+
+function blobText(body) {
+    return new PromiseObj(function (resolve) {
+
+        var reader = new FileReader();
+
+        reader.readAsText(body);
+        reader.onload = function () {
+            resolve(reader.result);
+        };
+
+    });
+}
+
+function isBlobText(body) {
+    return body.type.indexOf('text') === 0 || body.type.indexOf('json') !== -1;
+}
+
+/**
+ * HTTP Request.
+ */
+
+var Request = function Request(options$$1) {
+
+    this.body = null;
+    this.params = {};
+
+    assign(this, options$$1, {
+        method: toUpper(options$$1.method || 'GET')
+    });
+
+    if (!(this.headers instanceof Headers)) {
+        this.headers = new Headers(this.headers);
+    }
+};
+
+Request.prototype.getUrl = function getUrl (){
+    return Url(this);
+};
+
+Request.prototype.getBody = function getBody (){
+    return this.body;
+};
+
+Request.prototype.respondWith = function respondWith (body, options$$1) {
+    return new Response(body, assign(options$$1 || {}, {url: this.getUrl()}));
+};
+
+/**
+ * Service for sending network requests.
+ */
+
+var COMMON_HEADERS = {'Accept': 'application/json, text/plain, */*'};
+var JSON_CONTENT_TYPE = {'Content-Type': 'application/json;charset=utf-8'};
+
+function Http(options$$1) {
+
+    var self = this || {}, client = Client(self.$vm);
+
+    defaults(options$$1 || {}, self.$options, Http.options);
+
+    Http.interceptors.forEach(function (handler) {
+        client.use(handler);
+    });
+
+    return client(new Request(options$$1)).then(function (response) {
+
+        return response.ok ? response : PromiseObj.reject(response);
+
+    }, function (response) {
+
+        if (response instanceof Error) {
+            error(response);
+        }
+
+        return PromiseObj.reject(response);
+    });
+}
+
+Http.options = {};
+
+Http.headers = {
+    put: JSON_CONTENT_TYPE,
+    post: JSON_CONTENT_TYPE,
+    patch: JSON_CONTENT_TYPE,
+    delete: JSON_CONTENT_TYPE,
+    common: COMMON_HEADERS,
+    custom: {}
+};
+
+Http.interceptors = [before, method, body, jsonp, header, cors];
+
+['get', 'delete', 'head', 'jsonp'].forEach(function (method$$1) {
+
+    Http[method$$1] = function (url, options$$1) {
+        return this(assign(options$$1 || {}, {url: url, method: method$$1}));
+    };
+
+});
+
+['post', 'put', 'patch'].forEach(function (method$$1) {
+
+    Http[method$$1] = function (url, body$$1, options$$1) {
+        return this(assign(options$$1 || {}, {url: url, method: method$$1, body: body$$1}));
+    };
+
+});
+
+/**
+ * Service for interacting with RESTful services.
+ */
+
+function Resource(url, params, actions, options$$1) {
+
+    var self = this || {}, resource = {};
+
+    actions = assign({},
+        Resource.actions,
+        actions
+    );
+
+    each(actions, function (action, name) {
+
+        action = merge({url: url, params: assign({}, params)}, options$$1, action);
+
+        resource[name] = function () {
+            return (self.$http || Http)(opts(action, arguments));
+        };
+    });
+
+    return resource;
+}
+
+function opts(action, args) {
+
+    var options$$1 = assign({}, action), params = {}, body;
+
+    switch (args.length) {
+
+        case 2:
+
+            params = args[0];
+            body = args[1];
+
+            break;
+
+        case 1:
+
+            if (/^(POST|PUT|PATCH)$/i.test(options$$1.method)) {
+                body = args[0];
+            } else {
+                params = args[0];
+            }
+
+            break;
+
+        case 0:
+
+            break;
+
+        default:
+
+            throw 'Expected up to 2 arguments [params, body], got ' + args.length + ' arguments';
+    }
+
+    options$$1.body = body;
+    options$$1.params = assign({}, options$$1.params, params);
+
+    return options$$1;
+}
+
+Resource.actions = {
+
+    get: {method: 'GET'},
+    save: {method: 'POST'},
+    query: {method: 'GET'},
+    update: {method: 'PUT'},
+    remove: {method: 'DELETE'},
+    delete: {method: 'DELETE'}
+
+};
+
+/**
+ * Install plugin.
+ */
+
+function plugin(Vue) {
+
+    if (plugin.installed) {
+        return;
+    }
+
+    Util(Vue);
+
+    Vue.url = Url;
+    Vue.http = Http;
+    Vue.resource = Resource;
+    Vue.Promise = PromiseObj;
+
+    Object.defineProperties(Vue.prototype, {
+
+        $url: {
+            get: function get() {
+                return options(Vue.url, this, this.$options.url);
+            }
+        },
+
+        $http: {
+            get: function get() {
+                return options(Vue.http, this, this.$options.http);
+            }
+        },
+
+        $resource: {
+            get: function get() {
+                return Vue.resource.bind(this);
+            }
+        },
+
+        $promise: {
+            get: function get() {
+                var this$1 = this;
+
+                return function (executor) { return new Vue.Promise(executor, this$1); };
+            }
+        }
+
+    });
+}
+
+if (typeof window !== 'undefined' && window.Vue) {
+    window.Vue.use(plugin);
+}
+
+module.exports = plugin;
+
+}).apply(this, arguments);
+
+},{"got":33}],229:[function(require,module,exports){
 _hmr["websocket:null"].initModule("node_modules/vue/dist/vue.common.js", module);
 (function(){
 (function (process){
@@ -55381,7 +56915,7 @@ module.exports = Vue;
 }).call(this,require('_process'))
 }).apply(this, arguments);
 
-},{"_process":212}],229:[function(require,module,exports){
+},{"_process":212}],230:[function(require,module,exports){
 _hmr["websocket:null"].initModule("node_modules/wtf-8/wtf-8.js", module);
 (function(){
 (function (global){
@@ -55623,7 +57157,7 @@ _hmr["websocket:null"].initModule("node_modules/wtf-8/wtf-8.js", module);
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 }).apply(this, arguments);
 
-},{}],230:[function(require,module,exports){
+},{}],231:[function(require,module,exports){
 _hmr["websocket:null"].initModule("node_modules/yeast/index.js", module);
 (function(){
 'use strict';
@@ -55697,7 +57231,7 @@ module.exports = yeast;
 
 }).apply(this, arguments);
 
-},{}],231:[function(require,module,exports){
+},{}],232:[function(require,module,exports){
 _hmr["websocket:null"].initModule("resources/assets/js/app.js", module);
 (function(){
 'use strict';
@@ -55709,12 +57243,13 @@ _hmr["websocket:null"].initModule("resources/assets/js/app.js", module);
  */
 
 require('./bootstrap');
-require('./posts');
-require('./comments');
+require('./users');
+//require('./posts');
+//require('./comments');
 
 }).apply(this, arguments);
 
-},{"./bootstrap":232,"./comments":233,"./posts":234}],232:[function(require,module,exports){
+},{"./bootstrap":233,"./users":234}],233:[function(require,module,exports){
 _hmr["websocket:null"].initModule("resources/assets/js/bootstrap.js", module);
 (function(){
 'use strict';
@@ -55738,6 +57273,11 @@ require('bootstrap-sass');
  */
 
 window.Vue = require('vue');
+
+/**
+ * We will need Vue's $http...
+ */
+require('vue-resource');
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -55767,325 +57307,131 @@ window.axios.defaults.headers.common = {
 
 }).apply(this, arguments);
 
-},{"axios":4,"bootstrap-sass":32,"jquery":205,"lodash":207,"vue":228}],233:[function(require,module,exports){
-_hmr["websocket:null"].initModule("resources/assets/js/comments.js", module);
+},{"axios":4,"bootstrap-sass":32,"jquery":205,"lodash":207,"vue":229,"vue-resource":228}],234:[function(require,module,exports){
+_hmr["websocket:null"].initModule("resources/assets/js/users.js", module);
 (function(){
 'use strict';
 
-var modalSpinner = '<div class="centered"><i class="fa fa-spinner fa-spin" style="font-size:24px"></i></div>';
-
-var commentActions = {
-
-  filterForm: function filterForm(e, target) {
-    var join = $(target).data('url').indexOf('?') === -1 ? '?' : '&';
-    window.location.href = $(target).data('url') + join + 'filter=' + $.trim($(target).val());
+//window.Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
+new Vue({
+  el: '#manage-vue',
+  data: {
+    items: [],
+    pagination: {
+      total: 0,
+      per_page: 2,
+      from: 1,
+      to: 0,
+      current_page: 1
+    },
+    offset: 4,
+    formErrors: {},
+    formErrorsUpdate: {},
+    newItem: {
+      'title': '',
+      'description': ''
+    },
+    fillItem: {
+      'title': '',
+      'description': '',
+      'id': ''
+    }
   },
-
-  showEditForm: function showEditForm(e, target) {
-    $("#admin-comment-edit-modal .modal-body").html(modalSpinner);
-    $("#admin-comment-edit-modal").modal('show');
-    $.ajax({
-      url: '/comments/' + $(target).data('id') + '/edit'
-    }).done(function (result) {
-      $("#admin-comment-edit-modal .modal-body").html(result);
-    });
-  },
-
-  updateEntry: function updateEntry(e, target) {
-    e.preventDefault(e);
-    var url = '/comments/' + $('#comment_id').val();
-    var data = $('.modal-body form').serialize();
-    $("#admin-comment-edit-modal .modal-body .form-errors").html('');
-    var htmlSaved = $("#admin-comment-edit-modal .modal-body").html();
-    $("#admin-comment-edit-modal .modal-body").html(modalSpinner);
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: data,
-      dataType: 'json',
-      success: function success(result) {
-        $("#admin-comment-edit-modal").modal('hide');
-        window.location.reload();
-      },
-      error: function error(result) {
-        if (typeof result.responseJSON.message === 'string') {
-          alert(result.responseJSON.message);
-          $("#admin-comment-edit-modal").modal('hide');
-        } else {
-          $("#admin-comment-edit-modal .modal-body").html(htmlSaved);
-          $.each(result.responseJSON.message, function (i, v) {
-            $("#admin-comment-edit-modal .modal-body .form-errors").append('<div class="alert alert-danger">' + v + '</div>');
-          });
-        }
+  computed: {
+    isActived: function isActived() {
+      return this.pagination.current_page;
+    },
+    pagesNumber: function pagesNumber() {
+      if (!this.pagination.to) {
+        return [];
       }
-    });
-  },
-
-  deleteEntry: function deleteEntry(e, target) {
-    var isSoft = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-    if (!confirm(isSoft ? 'Hide this entry?' : 'Delete entry? This will also delete all related comments...')) {
-      return false;
-    }
-    var url = '/comments/' + $(target).data('id');
-    var data = {
-      '_token': window.Laravel.csrfToken
-    };
-    if (isSoft) {
-      data.isSoft = 1;
-    }
-    $.ajax({
-      type: "DELETE",
-      url: url,
-      data: data,
-      dataType: 'json',
-      success: function success(result) {
-        window.location.reload();
-      },
-      error: function error(result) {
-        alert(result.responseJSON.message);
+      var from = this.pagination.current_page - this.offset;
+      if (from < 1) {
+        from = 1;
       }
-    });
-  },
-
-  unhideEntry: function unhideEntry(e, target) {
-    var fullDelete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-
-    if (!confirm(!fullDelete ? 'Unhide this entry?' : 'Fully delete the entry?')) {
-      return false;
-    }
-    var url = '/comments/unhide';
-    var data = {
-      'id': $(target).data('id'),
-      '_method': 'PATCH',
-      '_token': window.Laravel.csrfToken
-    };
-    if (fullDelete) {
-      data.fullDelete = 1;
-    }
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: data,
-      dataType: 'json',
-      success: function success(result) {
-        window.location.reload();
-      },
-      error: function error(result) {
-        alert(result.responseJSON.message);
+      var to = from + this.offset * 2;
+      if (to >= this.pagination.last_page) {
+        to = this.pagination.last_page;
       }
-    });
+      var pagesArray = [];
+      while (from <= to) {
+        pagesArray.push(from);
+        from++;
+      }
+      return pagesArray;
+    }
+  },
+  ready: function ready() {
+    this.getVueItems(this.pagination.current_page);
+  },
+  methods: {
+    getVueItems: function getVueItems(page) {
+      var _this = this;
+
+      //console.log(this)
+      this.$http.get('/manage/users?page=' + page).then(function (response) {
+        _this.$set('items', response.data.data.data);
+        _this.$set('pagination', response.data.pagination);
+      });
+    },
+    createItem: function createItem() {
+      var _this2 = this;
+
+      var input = this.newItem;
+      this.$http.post('/manage/users', input).then(function (response) {
+        _this2.changePage(_this2.pagination.current_page);
+        _this2.newItem = {
+          'title': '',
+          'description': ''
+        };
+        $("#create-item").modal('hide');
+        toastr.success('Item Created Successfully.', 'Success Alert', {
+          timeOut: 5000
+        });
+      }, function (response) {
+        _this2.formErrors = response.data;
+      });
+    },
+    deleteItem: function deleteItem(item) {
+      var _this3 = this;
+
+      this.$http.delete('/manage/users/' + item.id).then(function (response) {
+        _this3.changePage(_this3.pagination.current_page);
+        toastr.success('Item Deleted Successfully.', 'Success Alert', {
+          timeOut: 5000
+        });
+      });
+    },
+    editItem: function editItem(item) {
+      this.fillItem.title = item.title;
+      this.fillItem.id = item.id;
+      this.fillItem.description = item.description;
+      $("#edit-item").modal('show');
+    },
+    updateItem: function updateItem(id) {
+      var _this4 = this;
+
+      var input = this.fillItem;
+      this.$http.put('/manage/users/' + id, input).then(function (response) {
+        _this4.changePage(_this4.pagination.current_page);
+        _this4.fillItem = {
+          'title': '',
+          'description': '',
+          'id': ''
+        };
+        $("#edit-item").modal('hide');
+        toastr.success('Item Updated Successfully.', 'Success Alert', {
+          timeOut: 5000
+        });
+      }, function (response) {
+        _this4.formErrorsUpdate = response.data;
+      });
+    },
+    changePage: function changePage(page) {
+      this.pagination.current_page = page;
+      this.getVueItems(page);
+    }
   }
-
-};
-
-$(document).on('click', '#btn-ok', function (e) {
-  commentActions.updateEntry(e, undefined);
-});
-
-$(document).on('click', '.admin-comment-edit', function (e) {
-  commentActions.showEditForm(e, this);
-});
-
-$(document).on('click', '.admin-comment-hide', function (e) {
-  commentActions.deleteEntry(e, this, true);
-});
-
-$(document).on('click', '.admin-comment-delete', function (e) {
-  commentActions.deleteEntry(e, this);
-});
-
-$(document).on('click', '.admin-comment-unhide', function (e) {
-  commentActions.unhideEntry(e, this);
-});
-
-$(document).on('click', '.admin-comment-deletehidden', function (e) {
-  commentActions.unhideEntry(e, this, true);
-});
-
-$(document).on('keyup', '#search-filter', function (e) {
-  if (e.which !== 13 || !$.trim($(this).val())) {
-    return;
-  }
-  commentActions.filterForm(e, this);
-});
-
-}).apply(this, arguments);
-
-},{}],234:[function(require,module,exports){
-_hmr["websocket:null"].initModule("resources/assets/js/posts.js", module);
-(function(){
-'use strict';
-
-var modalSpinner = '<div class="centered"><i class="fa fa-spinner fa-spin" style="font-size:24px"></i></div>';
-
-var postActions = {
-
-  filterForm: function filterForm(e, target) {
-    var join = $(target).data('url').indexOf('?') === -1 ? '?' : '&';
-    window.location.href = $(target).data('url') + join + 'filter=' + $.trim($(target).val());
-  },
-
-  showEditForm: function showEditForm(e, target) {
-    $("#admin-post-edit-modal .modal-body").html(modalSpinner);
-    $("#admin-post-edit-modal").modal('show');
-    $.ajax({
-      url: '/posts/' + $(target).data('id') + '/edit'
-    }).done(function (result) {
-      $("#admin-post-edit-modal .modal-body").html(result);
-    });
-  },
-
-  updateEntry: function updateEntry(e, target) {
-    e.preventDefault(e);
-    var url = '/posts/' + $('#post_id').val();
-    var data = $('.modal-body form').serialize();
-    $("#admin-post-edit-modal .modal-body .form-errors").html('');
-    var htmlSaved = $("#admin-post-edit-modal .modal-body").html();
-    $("#admin-post-edit-modal .modal-body").html(modalSpinner);
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: data,
-      dataType: 'json',
-      success: function success(result) {
-        $("#admin-post-edit-modal").modal('hide');
-        window.location.reload();
-      },
-      error: function error(result) {
-        if (typeof result.responseJSON.message === 'string') {
-          alert(result.responseJSON.message);
-          $("#admin-post-edit-modal").modal('hide');
-        } else {
-          $("#admin-post-edit-modal .modal-body").html(htmlSaved);
-          $.each(result.responseJSON.message, function (i, v) {
-            $("#admin-post-edit-modal .modal-body .form-errors").append('<div class="alert alert-danger">' + v + '</div>');
-          });
-        }
-      }
-    });
-  },
-
-  deleteEntry: function deleteEntry(e, target) {
-    var isSoft = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-    if (!confirm(isSoft ? 'Hide this entry?' : 'Delete entry? This will also delete all related comments...')) {
-      return false;
-    }
-    var url = '/posts/' + $(target).data('id');
-    var data = {
-      '_token': window.Laravel.csrfToken
-    };
-    if (isSoft) {
-      data.isSoft = 1;
-    }
-    $.ajax({
-      type: "DELETE",
-      url: url,
-      data: data,
-      dataType: 'json',
-      success: function success(result) {
-        window.location.reload();
-      },
-      error: function error(result) {
-        alert(result.responseJSON.message);
-      }
-    });
-  },
-
-  approveEntry: function approveEntry(e, target, flag) {
-    if (!confirm(!flag ? 'Unapprove this entry?' : 'Approve this entry?')) {
-      return false;
-    }
-    var url = '/posts/approve';
-    var data = {
-      'id': $(target).data('id'),
-      'flag': flag,
-      '_method': 'PATCH',
-      '_token': window.Laravel.csrfToken
-    };
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: data,
-      dataType: 'json',
-      success: function success(result) {
-        window.location.reload();
-      },
-      error: function error(result) {
-        alert(result.responseJSON.message);
-      }
-    });
-  },
-
-  unhideEntry: function unhideEntry(e, target) {
-    var fullDelete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-
-    if (!confirm(!fullDelete ? 'Unhide this entry?' : 'Fully delete the entry?')) {
-      return false;
-    }
-    var url = '/posts/unhide';
-    var data = {
-      'id': $(target).data('id'),
-      '_method': 'PATCH',
-      '_token': window.Laravel.csrfToken
-    };
-    if (fullDelete) {
-      data.fullDelete = 1;
-    }
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: data,
-      dataType: 'json',
-      success: function success(result) {
-        window.location.reload();
-      },
-      error: function error(result) {
-        alert(result.responseJSON.message);
-      }
-    });
-  }
-
-};
-
-$(document).on('click', '#btn-ok', function (e) {
-  postActions.updateEntry(e, undefined);
-});
-
-$(document).on('click', '.admin-post-edit', function (e) {
-  postActions.showEditForm(e, this);
-});
-
-$(document).on('click', '.admin-post-hide', function (e) {
-  postActions.deleteEntry(e, this, true);
-});
-
-$(document).on('click', '.admin-post-delete', function (e) {
-  postActions.deleteEntry(e, this);
-});
-
-$(document).on('click', '.admin-post-unapprove', function (e) {
-  postActions.approveEntry(e, this, 0);
-});
-
-$(document).on('click', '.admin-post-approve', function (e) {
-  postActions.approveEntry(e, this, 1);
-});
-
-$(document).on('click', '.admin-post-unhide', function (e) {
-  postActions.unhideEntry(e, this);
-});
-
-$(document).on('click', '.admin-post-deletehidden', function (e) {
-  postActions.unhideEntry(e, this, true);
-});
-
-$(document).on('keyup', '#search-filter', function (e) {
-  if (e.which !== 13 || !$.trim($(this).val())) {
-    return;
-  }
-  postActions.filterForm(e, this);
 });
 
 }).apply(this, arguments);
@@ -56094,7 +57440,7 @@ $(document).on('keyup', '#search-filter', function (e) {
 (function(global, _main, moduleDefs, cachedModules, _entries) {
   'use strict';
 
-  var moduleMeta = {"node_modules/browserify-hmr/lib/has.js":{"index":35,"hash":"Hky4QYVrU1+kFHIEuxPy","parents":["node_modules/browserify-hmr/lib/str-set.js","node_modules/browserify-hmr/inc/index.js"]},"resources/assets/js/posts.js":{"index":234,"hash":"rN0sdBb3R6d/toiV0Y/g","parents":["resources/assets/js/app.js"]},"resources/assets/js/comments.js":{"index":233,"hash":"PHl5gyYP9/X9xdcFf6fF","parents":["resources/assets/js/app.js"]},"node_modules/browserify-hmr/lib/str-set.js":{"index":36,"hash":"lcrDmQK4uaqOqN+FV4/9","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/socket.io-client/lib/on.js":{"index":215,"hash":"tjRZyGGz5Q0MA2qS81HN","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js"]},"node_modules/process/browser.js":{"index":212,"hash":"CIpPJUFWW4RUpwRm0KLF","parents":["node_modules/socket.io-client/node_modules/debug/browser.js","node_modules/vue/dist/vue.common.js","node_modules/axios/lib/adapters/xhr.js","node_modules/axios/lib/defaults.js","node_modules/engine.io-client/node_modules/debug/browser.js"]},"node_modules/socket.io-client/node_modules/component-emitter/index.js":{"index":218,"hash":"oN00wp8CctwYNQv6ryzF","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arraySome.js":{"index":55,"hash":"6MxplN9nt/AmANH1hnTa","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalArrays.js","node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/isArray.js":{"index":164,"hash":"aaUaNDXWFSVZ5STriBpj","parents":["node_modules/browserify-hmr/node_modules/lodash/filter.js","node_modules/browserify-hmr/node_modules/lodash/map.js","node_modules/browserify-hmr/node_modules/lodash/forEach.js","node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_isKey.js","node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js","node_modules/browserify-hmr/node_modules/lodash/_baseToString.js","node_modules/browserify-hmr/node_modules/lodash/_baseGetAllKeys.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js","node_modules/browserify-hmr/node_modules/lodash/_castPath.js","node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js","node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayEach.js":{"index":50,"hash":"b9UG7X0uCjshbsKWnzke","parents":["node_modules/browserify-hmr/node_modules/lodash/forEach.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayFilter.js":{"index":51,"hash":"Ev1suXdgsby5ZCXCkRms","parents":["node_modules/browserify-hmr/node_modules/lodash/filter.js","node_modules/browserify-hmr/node_modules/lodash/_getSymbols.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseZipObject.js":{"index":86,"hash":"YXMcZ83l88xZmDNehDaW","parents":["node_modules/browserify-hmr/node_modules/lodash/zipObject.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayMap.js":{"index":53,"hash":"WRdHK1dyumbtZQGeNdoR","parents":["node_modules/browserify-hmr/node_modules/lodash/map.js","node_modules/browserify-hmr/node_modules/lodash/_baseToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isPrototype.js":{"index":119,"hash":"z7lefPE53MX7955LE/f6","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseKeys.js","node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/socket.io-parser/is-buffer.js":{"index":223,"hash":"UJBXKAfBg/BkigSZbc3Z","parents":["node_modules/socket.io-parser/binary.js","node_modules/socket.io-parser/index.js"]},"node_modules/parseuri/index.js":{"index":211,"hash":"EzACpgP8IC8rgl7aVyRs","parents":["node_modules/socket.io-client/lib/url.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/socket.io-client/lib/url.js":{"index":217,"hash":"2e/RssAdMiqG5G1l8yhX","parents":["node_modules/socket.io-client/lib/index.js"]},"node_modules/socket.io-client/node_modules/debug/browser.js":{"index":219,"hash":"Q9ewCSPMnJcAJRPsyk4r","parents":["node_modules/socket.io-client/lib/url.js","node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js","node_modules/socket.io-client/lib/index.js"]},"node_modules/indexof/index.js":{"index":203,"hash":"8zMGV0j0ID5bUIeT7r+M","parents":["node_modules/engine.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js"]},"node_modules/component-bind/index.js":{"index":183,"hash":"4yIcVw+afwUsnTQyI0a3","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js"]},"node_modules/backo2/index.js":{"index":29,"hash":"L5ry3mfVEw1wgmx9Sa+q","parents":["node_modules/socket.io-client/lib/manager.js"]},"node_modules/to-array/index.js":{"index":227,"hash":"2EoggafxX+GLXkXiaGjm","parents":["node_modules/socket.io-client/lib/socket.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseSome.js":{"index":82,"hash":"/fx+wXc48GKu9ngo/G7R","parents":["node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseEach.js":{"index":59,"hash":"1eAUgjpN0REUkkfZ9ZIc","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseSome.js","node_modules/browserify-hmr/node_modules/lodash/_baseFilter.js","node_modules/browserify-hmr/node_modules/lodash/_baseMap.js","node_modules/browserify-hmr/node_modules/lodash/forEach.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseFilter.js":{"index":60,"hash":"zIF8T84UwJp2X27nHnkJ","parents":["node_modules/browserify-hmr/node_modules/lodash/filter.js"]},"node_modules/browserify-hmr/node_modules/lodash/filter.js":{"index":157,"hash":"xHkJOO00v5Ew3tJEbs2H","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js":{"index":73,"hash":"lFdaZihzm4HNQp2V6Bpv","parents":["node_modules/browserify-hmr/node_modules/lodash/filter.js","node_modules/browserify-hmr/node_modules/lodash/map.js","node_modules/browserify-hmr/node_modules/lodash/mapValues.js","node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/_castFunction.js":{"index":88,"hash":"17Fkqb/JTOTfTCbTGPvs","parents":["node_modules/browserify-hmr/node_modules/lodash/forEach.js","node_modules/browserify-hmr/node_modules/lodash/forOwn.js"]},"node_modules/browserify-hmr/node_modules/lodash/identity.js":{"index":162,"hash":"s1ZnXuz2CFxX2MXJyb7F","parents":["node_modules/browserify-hmr/node_modules/lodash/_castFunction.js","node_modules/browserify-hmr/node_modules/lodash/_baseSetToString.js","node_modules/browserify-hmr/node_modules/lodash/_baseRest.js","node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js"]},"node_modules/browserify-hmr/node_modules/lodash/_assignValue.js":{"index":56,"hash":"hmWN1NJKVbGe2ThBbBed","parents":["node_modules/browserify-hmr/node_modules/lodash/zipObject.js","node_modules/browserify-hmr/node_modules/lodash/_copyObject.js","node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseAssignValue.js":{"index":58,"hash":"UUmMep65Dt8mJru5Df0R","parents":["node_modules/browserify-hmr/node_modules/lodash/_assignValue.js","node_modules/browserify-hmr/node_modules/lodash/_copyObject.js","node_modules/browserify-hmr/node_modules/lodash/mapValues.js"]},"node_modules/browserify-hmr/node_modules/lodash/eq.js":{"index":156,"hash":"Be3fJIGKRC2SLwj96dmp","parents":["node_modules/browserify-hmr/node_modules/lodash/_assignValue.js","node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js","node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js","node_modules/browserify-hmr/node_modules/lodash/_assocIndexOf.js"]},"node_modules/browserify-hmr/node_modules/lodash/zipObject.js":{"index":182,"hash":"iztwVZmqQ7Y1i6QmGzx9","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseMap.js":{"index":75,"hash":"d4dyLnzZcVXFzz5tCc58","parents":["node_modules/browserify-hmr/node_modules/lodash/map.js"]},"node_modules/browserify-hmr/node_modules/lodash/isArrayLike.js":{"index":165,"hash":"/OCFIiBOK84sMLW6Tiiz","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMap.js","node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js","node_modules/browserify-hmr/node_modules/lodash/_createBaseEach.js","node_modules/browserify-hmr/node_modules/lodash/keys.js","node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/browserify-hmr/node_modules/lodash/map.js":{"index":174,"hash":"Gq/1p28f40AzWuWuaNZr","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_copyObject.js":{"index":90,"hash":"VAzIjaU/1tssj67rWjf/","parents":["node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isIndex.js":{"index":114,"hash":"SCdbG9iCDM1nxzb81i7D","parents":["node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js","node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/isObject.js":{"index":169,"hash":"H0M3JlacAn8wi5b/SH6J","parents":["node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js","node_modules/browserify-hmr/node_modules/lodash/_isStrictComparable.js","node_modules/browserify-hmr/node_modules/lodash/isFunction.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js":{"index":115,"hash":"Q6Y/4ZLjPN2hD0x360UE","parents":["node_modules/browserify-hmr/node_modules/lodash/_createAssigner.js","node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/isLength.js":{"index":168,"hash":"bwSRxcpcTX/CbMowl+qa","parents":["node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/isArrayLike.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsTypedArray.js"]},"node_modules/component-emitter/index.js":{"index":184,"hash":"0uL1LSa/mOj+Llu+HTZ7","parents":["node_modules/socket.io-parser/index.js"]},"node_modules/json3/lib/json3.js":{"index":206,"hash":"LXnegdmM3ELMiM4tQmqu","parents":["node_modules/socket.io-parser/index.js"]},"node_modules/bootstrap-sass/assets/javascripts/bootstrap.js":{"index":32,"hash":"Cr6N6zNN4bp0OwTQOZ6Z","parents":["resources/assets/js/bootstrap.js"]},"node_modules/jquery/dist/jquery.js":{"index":205,"hash":"16cdPddA6VdVInumRGo6","parents":["resources/assets/js/bootstrap.js"]},"node_modules/lodash/lodash.js":{"index":207,"hash":"OZ0DBqCd4DOMgpDH3lcc","parents":["resources/assets/js/bootstrap.js"]},"node_modules/browserify-hmr/node_modules/lodash/_createBaseEach.js":{"index":93,"hash":"j95laCMPOgHsNDIKPdsp","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseEach.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseForOwn.js":{"index":62,"hash":"wsDmgTH4vz3dPZ0ucogL","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseEach.js","node_modules/browserify-hmr/node_modules/lodash/forOwn.js","node_modules/browserify-hmr/node_modules/lodash/mapValues.js"]},"node_modules/browserify-hmr/node_modules/lodash/forEach.js":{"index":158,"hash":"jIBP8hzrl/TALmTGIzfp","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/has-binary/index.js":{"index":201,"hash":"GofcXFXhXC0uVJvLAw+2","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/engine.io-parser/lib/browser.js"]},"node_modules/isarray/index.js":{"index":204,"hash":"dKtews1S4sHvaZhZ+ceq","parents":["node_modules/has-binary/index.js","node_modules/socket.io-parser/binary.js"]},"node_modules/socket.io-client/lib/socket.js":{"index":216,"hash":"wNz1TmcWcSdV/fISvn75","parents":["node_modules/socket.io-client/lib/manager.js","node_modules/socket.io-client/lib/index.js"]},"node_modules/socket.io-parser/index.js":{"index":222,"hash":"zQr8NKW/h7J7hn1sTsRa","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js","node_modules/socket.io-client/lib/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_matchesStrictComparable.js":{"index":132,"hash":"+OqsD2+K9liTMiGDT3Y4","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js","node_modules/browserify-hmr/node_modules/lodash/_baseMatches.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseProperty.js":{"index":78,"hash":"kWjeI0xVLXmi/QD9uMSa","parents":["node_modules/browserify-hmr/node_modules/lodash/property.js"]},"node_modules/browserify-hmr/node_modules/lodash/_createBaseFor.js":{"index":94,"hash":"OeCELp37VytZuCN6Xtr+","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseFor.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseFor.js":{"index":61,"hash":"aDRpv9Ysd3A0P68kJrwN","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseForOwn.js"]},"node_modules/browserify-hmr/node_modules/lodash/keys.js":{"index":173,"hash":"AzwEiE+T6QrvlRtU3Z5w","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseForOwn.js","node_modules/browserify-hmr/node_modules/lodash/_getMatchData.js","node_modules/browserify-hmr/node_modules/lodash/assign.js","node_modules/browserify-hmr/node_modules/lodash/_getAllKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/forOwn.js":{"index":159,"hash":"Phxs3xQLZ6eXpzVwNsD+","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseTimes.js":{"index":83,"hash":"vQVHAQOeEJCBfl2Pb7SH","parents":["node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js"]},"node_modules/socket.io-parser/binary.js":{"index":221,"hash":"bAee8RukaXwuD/OeGN6F","parents":["node_modules/socket.io-parser/index.js"]},"node_modules/ms/index.js":{"index":208,"hash":"+i3MPFzut0mh8LK6NCY0","parents":["node_modules/socket.io-client/node_modules/debug/debug.js","node_modules/engine.io-client/node_modules/debug/debug.js"]},"node_modules/socket.io-client/node_modules/debug/debug.js":{"index":220,"hash":"5FZHGx7z7kdbTIz7MyR0","parents":["node_modules/socket.io-client/node_modules/debug/browser.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getMatchData.js":{"index":102,"hash":"QzO7KFepX9S2dqnbKqgt","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatches.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isStrictComparable.js":{"index":120,"hash":"rbCwfHyEpUrj4Z98kqqR","parents":["node_modules/browserify-hmr/node_modules/lodash/_getMatchData.js","node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/_toKey.js":{"index":152,"hash":"Fva7n1CrZYGNyjdfKbt3","parents":["node_modules/browserify-hmr/node_modules/lodash/property.js","node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_baseGet.js","node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/isSymbol.js":{"index":171,"hash":"uIIRbxfQUXadoioCe5+N","parents":["node_modules/browserify-hmr/node_modules/lodash/_toKey.js","node_modules/browserify-hmr/node_modules/lodash/_isKey.js","node_modules/browserify-hmr/node_modules/lodash/_baseToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_basePropertyDeep.js":{"index":79,"hash":"Zfrh9AQz1Ry2yPu2pByv","parents":["node_modules/browserify-hmr/node_modules/lodash/property.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseGet.js":{"index":63,"hash":"EQWKE8NGYTKR53FHpqW6","parents":["node_modules/browserify-hmr/node_modules/lodash/_basePropertyDeep.js","node_modules/browserify-hmr/node_modules/lodash/get.js"]},"node_modules/browserify-hmr/node_modules/lodash/property.js":{"index":177,"hash":"2hJfadtQXM/U3NbWpzGR","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isKey.js":{"index":116,"hash":"D13Ok63JqktDADwmaeBu","parents":["node_modules/browserify-hmr/node_modules/lodash/property.js","node_modules/browserify-hmr/node_modules/lodash/_castPath.js","node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/isObjectLike.js":{"index":170,"hash":"qRO1rf+QsMbu/mjKbljZ","parents":["node_modules/browserify-hmr/node_modules/lodash/isSymbol.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsArguments.js","node_modules/browserify-hmr/node_modules/lodash/isArguments.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsTypedArray.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqual.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseHasIn.js":{"index":66,"hash":"+7Ad7hoG+3kwDHiM0tNn","parents":["node_modules/browserify-hmr/node_modules/lodash/hasIn.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getValue.js":{"index":107,"hash":"ECu3UgrdoHGLOVPWr5mD","parents":["node_modules/browserify-hmr/node_modules/lodash/_getNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/_objectToString.js":{"index":137,"hash":"gcC0LTB2iC1gNln4H3WI","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseGetTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_apply.js":{"index":49,"hash":"XKkzZTghrlK6WTNW2Mdh","parents":["node_modules/browserify-hmr/node_modules/lodash/_overRest.js"]},"node_modules/browserify-hmr/node_modules/lodash/_overRest.js":{"index":139,"hash":"iDNTQ1nLZv3jwCD1fhKA","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseRest.js"]},"node_modules/browserify-hmr/node_modules/lodash/_shortOut.js":{"index":145,"hash":"IoUeHrEOcxqBK99ieVfK","parents":["node_modules/browserify-hmr/node_modules/lodash/_setToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/stubFalse.js":{"index":180,"hash":"bsNH9caMXr7Pdt8ruFJt","parents":["node_modules/browserify-hmr/node_modules/lodash/isBuffer.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseUnary.js":{"index":85,"hash":"cMYMf5ZcCBeLWbK9TQmI","parents":["node_modules/browserify-hmr/node_modules/lodash/isTypedArray.js"]},"node_modules/browserify-hmr/node_modules/lodash/_overArg.js":{"index":138,"hash":"DrVoGwBMK8ywtUgJJMWJ","parents":["node_modules/browserify-hmr/node_modules/lodash/_nativeKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/_nativeKeys.js":{"index":135,"hash":"Ksoa4f854F0/NggsS0Yh","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseKeys.js":{"index":74,"hash":"kmg69OeKnhCzjV1WMGzu","parents":["node_modules/browserify-hmr/node_modules/lodash/keys.js"]},"node_modules/axios/lib/helpers/bind.js":{"index":18,"hash":"7qz63sWc/avguoKZp/Tj","parents":["node_modules/axios/lib/utils.js","node_modules/axios/lib/axios.js"]},"node_modules/axios/lib/cancel/Cancel.js":{"index":7,"hash":"H5p8YXHwES9hf4g5J2Ix","parents":["node_modules/axios/lib/cancel/CancelToken.js","node_modules/axios/lib/axios.js"]},"node_modules/axios/lib/helpers/spread.js":{"index":27,"hash":"tRmNydzwpR2+f97xOT2R","parents":["node_modules/axios/lib/axios.js"]},"node_modules/axios/lib/cancel/isCancel.js":{"index":9,"hash":"I1e5Pa4+rYUPP2HOlgqQ","parents":["node_modules/axios/lib/core/dispatchRequest.js","node_modules/axios/lib/axios.js"]},"node_modules/vue/dist/vue.common.js":{"index":228,"hash":"5vHHdly24d9p5ZBGcbiv","parents":["resources/assets/js/bootstrap.js"]},"node_modules/socket.io-parser/node_modules/ms/index.js":{"index":226,"hash":"HanVKm5AkV6MOdHRAMCT","parents":["node_modules/socket.io-parser/node_modules/debug/debug.js"]},"node_modules/socket.io-parser/node_modules/debug/debug.js":{"index":225,"hash":"yqdR7nJc7wxIHzFDNzG+","parents":["node_modules/socket.io-parser/node_modules/debug/browser.js"]},"node_modules/socket.io-parser/node_modules/debug/browser.js":{"index":224,"hash":"S76q28f1VPJIcCtJn1eq","parents":["node_modules/socket.io-parser/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hasPath.js":{"index":108,"hash":"H9ddOWkLPRuFYq8fwTEv","parents":["node_modules/browserify-hmr/node_modules/lodash/hasIn.js"]},"node_modules/browserify-hmr/node_modules/lodash/isArguments.js":{"index":163,"hash":"iJIbQ7nb4q+C1riPMj/b","parents":["node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/_castPath.js":{"index":89,"hash":"GgKBkmr1sBRSb1yd72qJ","parents":["node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_baseGet.js"]},"node_modules/browserify-hmr/node_modules/lodash/hasIn.js":{"index":161,"hash":"o6j7gwruD7qKNbgMUe0j","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseGetTag.js":{"index":65,"hash":"ydPbt27q/TAHvOyjdq/H","parents":["node_modules/browserify-hmr/node_modules/lodash/isSymbol.js","node_modules/browserify-hmr/node_modules/lodash/isFunction.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsArguments.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsTypedArray.js","node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getRawTag.js":{"index":104,"hash":"MUL9l/iYFvZaG1vReTH3","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseGetTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Symbol.js":{"index":46,"hash":"I77NsH5p3PRVWpJOtN3+","parents":["node_modules/browserify-hmr/node_modules/lodash/_getRawTag.js","node_modules/browserify-hmr/node_modules/lodash/_baseGetTag.js","node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js","node_modules/browserify-hmr/node_modules/lodash/_baseToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_root.js":{"index":140,"hash":"MupxTyUFdnn90wmcJpPL","parents":["node_modules/browserify-hmr/node_modules/lodash/_Symbol.js","node_modules/browserify-hmr/node_modules/lodash/isBuffer.js","node_modules/browserify-hmr/node_modules/lodash/_Map.js","node_modules/browserify-hmr/node_modules/lodash/_Uint8Array.js","node_modules/browserify-hmr/node_modules/lodash/_DataView.js","node_modules/browserify-hmr/node_modules/lodash/_Promise.js","node_modules/browserify-hmr/node_modules/lodash/_Set.js","node_modules/browserify-hmr/node_modules/lodash/_WeakMap.js","node_modules/browserify-hmr/node_modules/lodash/_coreJsData.js"]},"node_modules/browserify-hmr/node_modules/lodash/isFunction.js":{"index":167,"hash":"0gysC+rTcZlhPWD04ANh","parents":["node_modules/browserify-hmr/node_modules/lodash/isArrayLike.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsArguments.js":{"index":67,"hash":"caWdwJw13ty+5+1x9erg","parents":["node_modules/browserify-hmr/node_modules/lodash/isArguments.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsTypedArray.js":{"index":72,"hash":"cPl0GH9tkUCpceUV6gAk","parents":["node_modules/browserify-hmr/node_modules/lodash/isTypedArray.js"]},"node_modules/browserify-hmr/node_modules/lodash/_nodeUtil.js":{"index":136,"hash":"a5iiX2Zkv5BTWgreCV8c","parents":["node_modules/browserify-hmr/node_modules/lodash/isTypedArray.js"]},"node_modules/browserify-hmr/node_modules/lodash/_freeGlobal.js":{"index":99,"hash":"JkBVfFsfGmCLIMhuNXD1","parents":["node_modules/browserify-hmr/node_modules/lodash/_nodeUtil.js","node_modules/browserify-hmr/node_modules/lodash/_root.js"]},"node_modules/browserify-hmr/node_modules/lodash/isTypedArray.js":{"index":172,"hash":"pNInOnl/2pKh0f1gDzOT","parents":["node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/axios/lib/utils.js":{"index":28,"hash":"iAJPkkHOoTQ0lV9mgUDF","parents":["node_modules/axios/lib/helpers/normalizeHeaderName.js","node_modules/axios/lib/core/InterceptorManager.js","node_modules/axios/lib/helpers/buildURL.js","node_modules/axios/lib/helpers/isURLSameOrigin.js","node_modules/axios/lib/helpers/parseHeaders.js","node_modules/axios/lib/helpers/cookies.js","node_modules/axios/lib/core/transformData.js","node_modules/axios/lib/core/dispatchRequest.js","node_modules/axios/lib/core/Axios.js","node_modules/axios/lib/adapters/xhr.js","node_modules/axios/lib/defaults.js","node_modules/axios/lib/axios.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackDelete.js":{"index":147,"hash":"LXafI5DDGP0wDwfpw8/U","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackGet.js":{"index":148,"hash":"BoHW4uFMtND7Gi+JPdJf","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackHas.js":{"index":149,"hash":"thY5y8jBCnJMfegnSD/V","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_toSource.js":{"index":153,"hash":"qhQsP8sNq2kil796yxWO","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/constant.js":{"index":155,"hash":"E/D07UC1hh81w2R6/inn","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseSetToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseSetToString.js":{"index":81,"hash":"iLxL219sz9iCOrPJz82a","parents":["node_modules/browserify-hmr/node_modules/lodash/_setToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_defineProperty.js":{"index":95,"hash":"0CbMU6r+0Uq1gikE9oNA","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseSetToString.js","node_modules/browserify-hmr/node_modules/lodash/_baseAssignValue.js"]},"node_modules/browserify-hmr/node_modules/lodash/_setToString.js":{"index":144,"hash":"hu7pnSotmEJV3Wx9OsJa","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseRest.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseRest.js":{"index":80,"hash":"SUX2Uj3EprmvmkcHcoY/","parents":["node_modules/browserify-hmr/node_modules/lodash/_createAssigner.js"]},"node_modules/browserify-hmr/node_modules/lodash/_createAssigner.js":{"index":92,"hash":"JEqSu7xxpSyH40Y4GJ+V","parents":["node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/browserify-hmr/node_modules/lodash/isBuffer.js":{"index":166,"hash":"Uzhm1jNtW1f55Gsz24+8","parents":["node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js":{"index":52,"hash":"RWu/FT9WAfaDXPoucuiD","parents":["node_modules/browserify-hmr/node_modules/lodash/keys.js"]},"node_modules/browserify-hmr/node_modules/lodash/assign.js":{"index":154,"hash":"6X7UP3eqxcj6o2ias2ID","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/axios/lib/cancel/CancelToken.js":{"index":8,"hash":"FHNSerik6mTW7UK588b6","parents":["node_modules/axios/lib/axios.js"]},"node_modules/engine.io-client/node_modules/component-emitter/index.js":{"index":196,"hash":"oN00wp8CctwYNQv6ryzF","parents":["node_modules/engine.io-client/lib/transport.js","node_modules/engine.io-client/lib/transports/polling-xhr.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/axios/lib/helpers/isAbsoluteURL.js":{"index":23,"hash":"vVWCDPr+MX6lpqXv8pbV","parents":["node_modules/axios/lib/core/Axios.js"]},"node_modules/axios/lib/helpers/combineURLs.js":{"index":21,"hash":"WcVx/KakaTKJx+B4Oqlg","parents":["node_modules/axios/lib/core/Axios.js"]},"node_modules/engine.io-parser/lib/keys.js":{"index":200,"hash":"oFyKNTA0twlyQVhVzp9n","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/parsejson/index.js":{"index":209,"hash":"wxV8aXhg9hh6MyO+FO0c","parents":["node_modules/engine.io-client/lib/socket.js"]},"node_modules/parseqs/index.js":{"index":210,"hash":"bFhhlHvfi+om+FJQz11d","parents":["node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackClear.js":{"index":146,"hash":"ibWAz8K0fFq6Bb0SS4B7","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_ListCache.js":{"index":39,"hash":"KxC/aKLlcuOS+PWx1HyP","parents":["node_modules/browserify-hmr/node_modules/lodash/_stackClear.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheClear.js","node_modules/browserify-hmr/node_modules/lodash/_stackSet.js","node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheClear.js":{"index":121,"hash":"CHLB/DjalyhgxdfpsCnW","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_cacheHas.js":{"index":87,"hash":"zwJaX7fkgHAdYeTtYO2G","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalArrays.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapToArray.js":{"index":131,"hash":"XUQTl0anVZnXaUOrmxD7","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_setToArray.js":{"index":143,"hash":"gUyAUZoZS3v/gnhOBsLW","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js"]},"node_modules/axios/lib/helpers/normalizeHeaderName.js":{"index":25,"hash":"ZOnEbUQ4gAqyOWXM/MJz","parents":["node_modules/axios/lib/defaults.js"]},"node_modules/axios/lib/core/InterceptorManager.js":{"index":11,"hash":"eKcTD61ZQvp+fRuqC8MM","parents":["node_modules/axios/lib/core/Axios.js"]},"node_modules/browser-resolve/empty.js":{"index":33,"hash":"47DEQpj8HBSa+/TImW+5","parents":["node_modules/engine.io-client/lib/transports/websocket.js"]},"node_modules/axios/lib/helpers/btoa.js":{"index":19,"hash":"50rlLXO/5hRkYfgSsE36","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/engine.io-client/lib/transport.js":{"index":189,"hash":"mp7fZlClWfLgH++23uT2","parents":["node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/engine.io-parser/lib/browser.js":{"index":199,"hash":"Oa/D6NTXKCm7QJPlaAXe","parents":["node_modules/engine.io-client/lib/transport.js","node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/socket.js","node_modules/engine.io-client/lib/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheGet.js":{"index":123,"hash":"SZAC3U/+BLssJw9WKbhb","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_assocIndexOf.js":{"index":57,"hash":"+YtyXqBKKXnwrSmv/2eU","parents":["node_modules/browserify-hmr/node_modules/lodash/_listCacheGet.js","node_modules/browserify-hmr/node_modules/lodash/_listCacheHas.js","node_modules/browserify-hmr/node_modules/lodash/_listCacheSet.js","node_modules/browserify-hmr/node_modules/lodash/_listCacheDelete.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheHas.js":{"index":124,"hash":"2tu2JqPxTVjaJm/WbeGw","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheSet.js":{"index":125,"hash":"dVcwdgHP8vQHHPnX+pql","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Map.js":{"index":40,"hash":"aezyd9/dXR4WmT/cJk4B","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheClear.js","node_modules/browserify-hmr/node_modules/lodash/_stackSet.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getNative.js":{"index":103,"hash":"c5Ljj0yzzW4dPj+JomYZ","parents":["node_modules/browserify-hmr/node_modules/lodash/_Map.js","node_modules/browserify-hmr/node_modules/lodash/_DataView.js","node_modules/browserify-hmr/node_modules/lodash/_Promise.js","node_modules/browserify-hmr/node_modules/lodash/_Set.js","node_modules/browserify-hmr/node_modules/lodash/_WeakMap.js","node_modules/browserify-hmr/node_modules/lodash/_defineProperty.js","node_modules/browserify-hmr/node_modules/lodash/_nativeCreate.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Uint8Array.js":{"index":47,"hash":"Zc6+hCmhnXc0Y6Asmckn","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js":{"index":97,"hash":"5sdsIGyCGshbuSoIxoXa","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_equalArrays.js":{"index":96,"hash":"FLnT7PvdDDobU/p0ty8u","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_DataView.js":{"index":37,"hash":"N7jUbJyl5TusFXojFUuz","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Promise.js":{"index":42,"hash":"T4OR1RtxAOTYyC9xrI13","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Set.js":{"index":43,"hash":"BRcgMZjGEVgVhv4GaR6q","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_WeakMap.js":{"index":48,"hash":"iuNSA30LsHH/h10pNsQ6","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getTag.js":{"index":106,"hash":"rZSqomckxeMx8IEK6dQG","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_coreJsData.js":{"index":91,"hash":"mWDHPw3O0bwyURVR4xz+","parents":["node_modules/browserify-hmr/node_modules/lodash/_isMasked.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isMasked.js":{"index":118,"hash":"vCLMgg9t+moWMD2eCyQw","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js":{"index":71,"hash":"HplAaZjQs9R/bNG2XV0a","parents":["node_modules/browserify-hmr/node_modules/lodash/_getNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/mapValues.js":{"index":175,"hash":"wGzYh7rOmnr5NbNf31Xh","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_setCacheAdd.js":{"index":141,"hash":"yUbHLrOe8uWgSDa2EOmH","parents":["node_modules/browserify-hmr/node_modules/lodash/_SetCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_setCacheHas.js":{"index":142,"hash":"aSivpixRq6mV4rYXkVzt","parents":["node_modules/browserify-hmr/node_modules/lodash/_SetCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_SetCache.js":{"index":44,"hash":"DKcn0VM+nqBtuxUGd3JS","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalArrays.js"]},"node_modules/browserify-hmr/node_modules/lodash/_MapCache.js":{"index":41,"hash":"XbhLy8omrsa87tk7GrBc","parents":["node_modules/browserify-hmr/node_modules/lodash/_SetCache.js","node_modules/browserify-hmr/node_modules/lodash/memoize.js","node_modules/browserify-hmr/node_modules/lodash/_stackSet.js"]},"node_modules/axios/lib/helpers/buildURL.js":{"index":20,"hash":"/NGEKCSjJtQmLL9YgQ19","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/helpers/isURLSameOrigin.js":{"index":24,"hash":"Q23gyeHuCUz6urO9LiH6","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/helpers/parseHeaders.js":{"index":26,"hash":"RSaxrIhXzzKyKZUYYMuV","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/helpers/cookies.js":{"index":22,"hash":"bosLflNojvUQNanxX8Ou","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/core/settle.js":{"index":15,"hash":"oBiMdGYIWstYzLllkvdc","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/core/createError.js":{"index":12,"hash":"gewqDvLDQxuCJgfCZVcg","parents":["node_modules/axios/lib/core/settle.js","node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/core/transformData.js":{"index":16,"hash":"ogPxBrH/+f25p5LI/dDI","parents":["node_modules/axios/lib/core/dispatchRequest.js"]},"node_modules/axios/lib/core/dispatchRequest.js":{"index":13,"hash":"HtiwIy/HS1A24N/qgh+i","parents":["node_modules/axios/lib/core/Axios.js"]},"node_modules/axios/lib/defaults.js":{"index":17,"hash":"qltyCvzMIprq5m6tzw01","parents":["node_modules/axios/lib/core/dispatchRequest.js","node_modules/axios/lib/core/Axios.js","node_modules/axios/lib/axios.js"]},"node_modules/axios/lib/core/Axios.js":{"index":10,"hash":"Y6SCtUi9Dxs62r8mPrVj","parents":["node_modules/axios/lib/axios.js"]},"node_modules/wtf-8/wtf-8.js":{"index":229,"hash":"k6X632uKvHp6yK4OCn1D","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/arraybuffer.slice/index.js":{"index":3,"hash":"RSb5Zx9CgX3adjzbvf/k","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/after/index.js":{"index":2,"hash":"NzPfXWECmM8rW/6fdkcj","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/blob/index.js":{"index":31,"hash":"q7L6uHK9eN9yEvDVNxJw","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/axios/lib/core/enhanceError.js":{"index":14,"hash":"jQgfNs13AFaI52OMk6Uz","parents":["node_modules/axios/lib/core/createError.js"]},"node_modules/axios/lib/adapters/xhr.js":{"index":5,"hash":"aAqW8YO7v3QEaiiYtYs7","parents":["node_modules/axios/lib/defaults.js","node_modules/axios/lib/defaults.js"]},"node_modules/axios/lib/axios.js":{"index":6,"hash":"HIDoC1nh7uFupiQwyIon","parents":["node_modules/axios/index.js"]},"node_modules/axios/index.js":{"index":4,"hash":"i3hbSNtq55ltbO/Ev0Ye","parents":["resources/assets/js/bootstrap.js"]},"resources/assets/js/bootstrap.js":{"index":232,"hash":"ijjfEB7cooAZ8KZtO9tY","parents":["resources/assets/js/app.js"]},"resources/assets/js/app.js":{"index":231,"hash":"JHFgFvqOH/Sct02GxHIb","parents":[]},"node_modules/base64-arraybuffer/lib/base64-arraybuffer.js":{"index":30,"hash":"8XSfHUrJJCZLdLVRE4Xb","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/has-cors/index.js":{"index":202,"hash":"HwTb4UF/S089ZYA8hrRl","parents":["node_modules/engine.io-client/lib/xmlhttprequest.js"]},"node_modules/engine.io-client/lib/xmlhttprequest.js":{"index":195,"hash":"bdorKhduNvEqwPS8Ryma","parents":["node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/transports/polling-xhr.js","node_modules/engine.io-client/lib/transports/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheDelete.js":{"index":122,"hash":"o3YDg6klGWlCS2PgzZy+","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheGet.js":{"index":128,"hash":"dglUiNgT6mYn3/TLOqMD","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getMapData.js":{"index":101,"hash":"ZdeLudBY90L64kFsAIQL","parents":["node_modules/browserify-hmr/node_modules/lodash/_mapCacheGet.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheHas.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheSet.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheDelete.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheHas.js":{"index":129,"hash":"S0HdvBVxOySQIIMRmtf0","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheSet.js":{"index":130,"hash":"Rk8Cf6ZeJaOWzM2bXiED","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseToString.js":{"index":84,"hash":"AnA1FrHVlMlph8hPfQFk","parents":["node_modules/browserify-hmr/node_modules/lodash/toString.js"]},"node_modules/browserify-hmr/node_modules/lodash/toString.js":{"index":181,"hash":"u6lNu4mjQVTOavtG4Hpr","parents":["node_modules/browserify-hmr/node_modules/lodash/_castPath.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayPush.js":{"index":54,"hash":"/EQp182bKyQYd9DyjHRq","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseGetAllKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseGetAllKeys.js":{"index":64,"hash":"G/yC9530/ahn/dgrrslT","parents":["node_modules/browserify-hmr/node_modules/lodash/_getAllKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/stubArray.js":{"index":179,"hash":"hpV3ZtG8dCYBLEBt0XqS","parents":["node_modules/browserify-hmr/node_modules/lodash/_getSymbols.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getSymbols.js":{"index":105,"hash":"PoUL82x850fu8UHfzZjw","parents":["node_modules/browserify-hmr/node_modules/lodash/_getAllKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getAllKeys.js":{"index":100,"hash":"3JYThcdBa6xFuMLEJAcf","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalObjects.js"]},"node_modules/browserify-hmr/node_modules/lodash/_equalObjects.js":{"index":98,"hash":"Rc9NYU8R1s/bWUnUOXOJ","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js":{"index":69,"hash":"a5Qj+02BWo5995Nobe+v","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqual.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Stack.js":{"index":45,"hash":"/wytiRFlfgg4krF9Qz6a","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsMatch.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsEqual.js":{"index":68,"hash":"IfD9jeZw2S45+s0BZ1L3","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsMatch.js"]},"node_modules/engine.io-client/lib/transports/polling-jsonp.js":{"index":191,"hash":"oEkG83OYr+yF9+O6KIZU","parents":["node_modules/engine.io-client/lib/transports/index.js"]},"node_modules/engine.io-client/lib/transports/polling.js":{"index":193,"hash":"iR9NdLeAEs8vSYk/mMqT","parents":["node_modules/engine.io-client/lib/transports/polling-jsonp.js","node_modules/engine.io-client/lib/transports/polling-xhr.js"]},"node_modules/component-inherit/index.js":{"index":185,"hash":"T0Fqch4d4akvlr8bh7lc","parents":["node_modules/engine.io-client/lib/transports/polling-jsonp.js","node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/transports/polling-xhr.js"]},"node_modules/yeast/index.js":{"index":230,"hash":"ZM3+5w4l/D2f6x7svySF","parents":["node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js"]},"node_modules/engine.io-client/lib/transports/websocket.js":{"index":194,"hash":"T9c/ggKNrbmnrHTUqZ8f","parents":["node_modules/engine.io-client/lib/transports/index.js"]},"node_modules/engine.io-client/node_modules/debug/browser.js":{"index":197,"hash":"Q9ewCSPMnJcAJRPsyk4r","parents":["node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/transports/polling-xhr.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/engine.io-client/node_modules/debug/debug.js":{"index":198,"hash":"5FZHGx7z7kdbTIz7MyR0","parents":["node_modules/engine.io-client/node_modules/debug/browser.js"]},"node_modules/browserify-hmr/node_modules/lodash/memoize.js":{"index":176,"hash":"avTk3nhklvyvSxLNiUwd","parents":["node_modules/browserify-hmr/node_modules/lodash/_memoizeCapped.js"]},"node_modules/browserify-hmr/node_modules/lodash/_memoizeCapped.js":{"index":133,"hash":"HacnckK3nw4vtSYbX7i/","parents":["node_modules/browserify-hmr/node_modules/lodash/_stringToPath.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stringToPath.js":{"index":151,"hash":"nTlFZDUaGsY0w/l3Daka","parents":["node_modules/browserify-hmr/node_modules/lodash/_castPath.js"]},"node_modules/browserify-hmr/node_modules/lodash/get.js":{"index":160,"hash":"l8Xm0+dbrUDVfD0OVsKH","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js":{"index":77,"hash":"JUSg/+I63FvjCRBMWDG8","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hashDelete.js":{"index":110,"hash":"CmVwjIdw4ONOgfUyiaMT","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isKeyable.js":{"index":117,"hash":"NQsK9iVUkTA1EsHPdaK1","parents":["node_modules/browserify-hmr/node_modules/lodash/_getMapData.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheDelete.js":{"index":127,"hash":"Y2RLt8NGt0Im9c9uXXcS","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/engine.io-client/lib/transports/polling-xhr.js":{"index":192,"hash":"4NXW28jfIrijZLTpANlT","parents":["node_modules/engine.io-client/lib/transports/index.js"]},"node_modules/engine.io-client/lib/transports/index.js":{"index":190,"hash":"oFkQ4RgDHQJ8Ae5piZNj","parents":["node_modules/engine.io-client/lib/socket.js"]},"node_modules/engine.io-client/lib/socket.js":{"index":188,"hash":"kT2TeXgVs1CyKphjblzf","parents":["node_modules/engine.io-client/lib/index.js"]},"node_modules/engine.io-client/lib/index.js":{"index":187,"hash":"G6QYuSNu0EcS+G5tR9NE","parents":["node_modules/engine.io-client/index.js"]},"node_modules/engine.io-client/index.js":{"index":186,"hash":"TaZh2zcEs5+SiarJ3uJN","parents":["node_modules/socket.io-client/lib/manager.js"]},"node_modules/socket.io-client/lib/manager.js":{"index":214,"hash":"ea8fbXBXjC66BIPF5Pam","parents":["node_modules/socket.io-client/lib/index.js"]},"node_modules/socket.io-client/lib/index.js":{"index":213,"hash":"s/15kyEjN0kWB5dYl/1h","parents":[]},"node_modules/browserify-hmr/node_modules/lodash/_hashGet.js":{"index":111,"hash":"dc0CR5GuEuyIhxwkyCwj","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_nativeCreate.js":{"index":134,"hash":"QnEWfxsVWqcrQRLl5xaD","parents":["node_modules/browserify-hmr/node_modules/lodash/_hashGet.js","node_modules/browserify-hmr/node_modules/lodash/_hashHas.js","node_modules/browserify-hmr/node_modules/lodash/_hashSet.js","node_modules/browserify-hmr/node_modules/lodash/_hashClear.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hashHas.js":{"index":112,"hash":"fr70n7H4vKHBcQoEXEpO","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hashSet.js":{"index":113,"hash":"GANy9myYOl9CQUX6Hi+w","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hashClear.js":{"index":109,"hash":"2feZ9hRgUzW8Djw0JrqE","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Hash.js":{"index":38,"hash":"hTyKHFwLDhT8hzgE2zlD","parents":["node_modules/browserify-hmr/node_modules/lodash/_mapCacheClear.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheClear.js":{"index":126,"hash":"6D5+Bp90PNozl9Vr8wu2","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackSet.js":{"index":150,"hash":"rFq/zAhyEaIffTCH45Gf","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsMatch.js":{"index":70,"hash":"yrF79Y2F5RiVXHPZgzhK","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatches.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseMatches.js":{"index":76,"hash":"eM6GzX+YFfSSvWUut1RW","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js"]},"node_modules/browserify-hmr/node_modules/lodash/some.js":{"index":178,"hash":"o5R2DTe3L0fWtByoF6NK","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/inc/index.js":{"index":34,"hash":"MGH8WksqsFtrirdPnhgt","parents":[]}};
+  var moduleMeta = {"node_modules/browserify-hmr/lib/has.js":{"index":35,"hash":"Hky4QYVrU1+kFHIEuxPy","parents":["node_modules/browserify-hmr/lib/str-set.js","node_modules/browserify-hmr/inc/index.js"]},"resources/assets/js/users.js":{"index":234,"hash":"dxMX51InvoanlsWPoPMI","parents":["resources/assets/js/app.js"]},"node_modules/browserify-hmr/lib/str-set.js":{"index":36,"hash":"lcrDmQK4uaqOqN+FV4/9","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/socket.io-client/lib/on.js":{"index":215,"hash":"tjRZyGGz5Q0MA2qS81HN","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js"]},"node_modules/socket.io-client/node_modules/component-emitter/index.js":{"index":218,"hash":"oN00wp8CctwYNQv6ryzF","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js"]},"node_modules/process/browser.js":{"index":212,"hash":"CIpPJUFWW4RUpwRm0KLF","parents":["node_modules/socket.io-client/node_modules/debug/browser.js","node_modules/vue/dist/vue.common.js","node_modules/axios/lib/adapters/xhr.js","node_modules/axios/lib/defaults.js","node_modules/engine.io-client/node_modules/debug/browser.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arraySome.js":{"index":55,"hash":"6MxplN9nt/AmANH1hnTa","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalArrays.js","node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/isArray.js":{"index":164,"hash":"aaUaNDXWFSVZ5STriBpj","parents":["node_modules/browserify-hmr/node_modules/lodash/map.js","node_modules/browserify-hmr/node_modules/lodash/filter.js","node_modules/browserify-hmr/node_modules/lodash/forEach.js","node_modules/browserify-hmr/node_modules/lodash/_isKey.js","node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js","node_modules/browserify-hmr/node_modules/lodash/_baseToString.js","node_modules/browserify-hmr/node_modules/lodash/_baseGetAllKeys.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js","node_modules/browserify-hmr/node_modules/lodash/_castPath.js","node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js","node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayEach.js":{"index":50,"hash":"b9UG7X0uCjshbsKWnzke","parents":["node_modules/browserify-hmr/node_modules/lodash/forEach.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayMap.js":{"index":53,"hash":"WRdHK1dyumbtZQGeNdoR","parents":["node_modules/browserify-hmr/node_modules/lodash/map.js","node_modules/browserify-hmr/node_modules/lodash/_baseToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayFilter.js":{"index":51,"hash":"Ev1suXdgsby5ZCXCkRms","parents":["node_modules/browserify-hmr/node_modules/lodash/filter.js","node_modules/browserify-hmr/node_modules/lodash/_getSymbols.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseZipObject.js":{"index":86,"hash":"YXMcZ83l88xZmDNehDaW","parents":["node_modules/browserify-hmr/node_modules/lodash/zipObject.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isPrototype.js":{"index":119,"hash":"z7lefPE53MX7955LE/f6","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseKeys.js","node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/socket.io-parser/is-buffer.js":{"index":223,"hash":"UJBXKAfBg/BkigSZbc3Z","parents":["node_modules/socket.io-parser/binary.js","node_modules/socket.io-parser/index.js"]},"node_modules/parseuri/index.js":{"index":211,"hash":"EzACpgP8IC8rgl7aVyRs","parents":["node_modules/socket.io-client/lib/url.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/socket.io-client/lib/url.js":{"index":217,"hash":"2e/RssAdMiqG5G1l8yhX","parents":["node_modules/socket.io-client/lib/index.js"]},"node_modules/socket.io-client/node_modules/debug/browser.js":{"index":219,"hash":"Q9ewCSPMnJcAJRPsyk4r","parents":["node_modules/socket.io-client/lib/url.js","node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js","node_modules/socket.io-client/lib/index.js"]},"node_modules/component-bind/index.js":{"index":183,"hash":"4yIcVw+afwUsnTQyI0a3","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js"]},"node_modules/indexof/index.js":{"index":203,"hash":"8zMGV0j0ID5bUIeT7r+M","parents":["node_modules/engine.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js"]},"node_modules/backo2/index.js":{"index":29,"hash":"L5ry3mfVEw1wgmx9Sa+q","parents":["node_modules/socket.io-client/lib/manager.js"]},"node_modules/to-array/index.js":{"index":227,"hash":"2EoggafxX+GLXkXiaGjm","parents":["node_modules/socket.io-client/lib/socket.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseSome.js":{"index":82,"hash":"/fx+wXc48GKu9ngo/G7R","parents":["node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseEach.js":{"index":59,"hash":"1eAUgjpN0REUkkfZ9ZIc","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseSome.js","node_modules/browserify-hmr/node_modules/lodash/_baseMap.js","node_modules/browserify-hmr/node_modules/lodash/_baseFilter.js","node_modules/browserify-hmr/node_modules/lodash/forEach.js"]},"node_modules/browserify-hmr/node_modules/lodash/_castFunction.js":{"index":88,"hash":"17Fkqb/JTOTfTCbTGPvs","parents":["node_modules/browserify-hmr/node_modules/lodash/forEach.js","node_modules/browserify-hmr/node_modules/lodash/forOwn.js"]},"node_modules/browserify-hmr/node_modules/lodash/identity.js":{"index":162,"hash":"s1ZnXuz2CFxX2MXJyb7F","parents":["node_modules/browserify-hmr/node_modules/lodash/_castFunction.js","node_modules/browserify-hmr/node_modules/lodash/_baseSetToString.js","node_modules/browserify-hmr/node_modules/lodash/_baseRest.js","node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseMap.js":{"index":75,"hash":"d4dyLnzZcVXFzz5tCc58","parents":["node_modules/browserify-hmr/node_modules/lodash/map.js"]},"node_modules/browserify-hmr/node_modules/lodash/isArrayLike.js":{"index":165,"hash":"/OCFIiBOK84sMLW6Tiiz","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMap.js","node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js","node_modules/browserify-hmr/node_modules/lodash/_createBaseEach.js","node_modules/browserify-hmr/node_modules/lodash/keys.js","node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/browserify-hmr/node_modules/lodash/map.js":{"index":174,"hash":"Gq/1p28f40AzWuWuaNZr","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js":{"index":73,"hash":"lFdaZihzm4HNQp2V6Bpv","parents":["node_modules/browserify-hmr/node_modules/lodash/map.js","node_modules/browserify-hmr/node_modules/lodash/filter.js","node_modules/browserify-hmr/node_modules/lodash/mapValues.js","node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseFilter.js":{"index":60,"hash":"zIF8T84UwJp2X27nHnkJ","parents":["node_modules/browserify-hmr/node_modules/lodash/filter.js"]},"node_modules/browserify-hmr/node_modules/lodash/filter.js":{"index":157,"hash":"xHkJOO00v5Ew3tJEbs2H","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_assignValue.js":{"index":56,"hash":"hmWN1NJKVbGe2ThBbBed","parents":["node_modules/browserify-hmr/node_modules/lodash/zipObject.js","node_modules/browserify-hmr/node_modules/lodash/_copyObject.js","node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseAssignValue.js":{"index":58,"hash":"UUmMep65Dt8mJru5Df0R","parents":["node_modules/browserify-hmr/node_modules/lodash/_assignValue.js","node_modules/browserify-hmr/node_modules/lodash/_copyObject.js","node_modules/browserify-hmr/node_modules/lodash/mapValues.js"]},"node_modules/browserify-hmr/node_modules/lodash/eq.js":{"index":156,"hash":"Be3fJIGKRC2SLwj96dmp","parents":["node_modules/browserify-hmr/node_modules/lodash/_assignValue.js","node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js","node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js","node_modules/browserify-hmr/node_modules/lodash/_assocIndexOf.js"]},"node_modules/browserify-hmr/node_modules/lodash/zipObject.js":{"index":182,"hash":"iztwVZmqQ7Y1i6QmGzx9","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_copyObject.js":{"index":90,"hash":"VAzIjaU/1tssj67rWjf/","parents":["node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isIndex.js":{"index":114,"hash":"SCdbG9iCDM1nxzb81i7D","parents":["node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js","node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/isObject.js":{"index":169,"hash":"H0M3JlacAn8wi5b/SH6J","parents":["node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js","node_modules/browserify-hmr/node_modules/lodash/_isStrictComparable.js","node_modules/browserify-hmr/node_modules/lodash/isFunction.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isIterateeCall.js":{"index":115,"hash":"Q6Y/4ZLjPN2hD0x360UE","parents":["node_modules/browserify-hmr/node_modules/lodash/_createAssigner.js","node_modules/browserify-hmr/node_modules/lodash/some.js"]},"node_modules/browserify-hmr/node_modules/lodash/isLength.js":{"index":168,"hash":"bwSRxcpcTX/CbMowl+qa","parents":["node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/isArrayLike.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsTypedArray.js"]},"node_modules/component-emitter/index.js":{"index":184,"hash":"0uL1LSa/mOj+Llu+HTZ7","parents":["node_modules/socket.io-parser/index.js"]},"node_modules/json3/lib/json3.js":{"index":206,"hash":"LXnegdmM3ELMiM4tQmqu","parents":["node_modules/socket.io-parser/index.js"]},"node_modules/bootstrap-sass/assets/javascripts/bootstrap.js":{"index":32,"hash":"Cr6N6zNN4bp0OwTQOZ6Z","parents":["resources/assets/js/bootstrap.js"]},"node_modules/jquery/dist/jquery.js":{"index":205,"hash":"16cdPddA6VdVInumRGo6","parents":["resources/assets/js/bootstrap.js"]},"node_modules/lodash/lodash.js":{"index":207,"hash":"OZ0DBqCd4DOMgpDH3lcc","parents":["resources/assets/js/bootstrap.js"]},"node_modules/browserify-hmr/node_modules/lodash/_createBaseEach.js":{"index":93,"hash":"j95laCMPOgHsNDIKPdsp","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseEach.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseForOwn.js":{"index":62,"hash":"wsDmgTH4vz3dPZ0ucogL","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseEach.js","node_modules/browserify-hmr/node_modules/lodash/forOwn.js","node_modules/browserify-hmr/node_modules/lodash/mapValues.js"]},"node_modules/browserify-hmr/node_modules/lodash/forEach.js":{"index":158,"hash":"jIBP8hzrl/TALmTGIzfp","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/has-binary/index.js":{"index":201,"hash":"GofcXFXhXC0uVJvLAw+2","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/engine.io-parser/lib/browser.js"]},"node_modules/isarray/index.js":{"index":204,"hash":"dKtews1S4sHvaZhZ+ceq","parents":["node_modules/has-binary/index.js","node_modules/socket.io-parser/binary.js"]},"node_modules/socket.io-client/lib/socket.js":{"index":216,"hash":"wNz1TmcWcSdV/fISvn75","parents":["node_modules/socket.io-client/lib/manager.js","node_modules/socket.io-client/lib/index.js"]},"node_modules/socket.io-parser/index.js":{"index":222,"hash":"zQr8NKW/h7J7hn1sTsRa","parents":["node_modules/socket.io-client/lib/socket.js","node_modules/socket.io-client/lib/manager.js","node_modules/socket.io-client/lib/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_matchesStrictComparable.js":{"index":132,"hash":"+OqsD2+K9liTMiGDT3Y4","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js","node_modules/browserify-hmr/node_modules/lodash/_baseMatches.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseProperty.js":{"index":78,"hash":"kWjeI0xVLXmi/QD9uMSa","parents":["node_modules/browserify-hmr/node_modules/lodash/property.js"]},"node_modules/browserify-hmr/node_modules/lodash/_createBaseFor.js":{"index":94,"hash":"OeCELp37VytZuCN6Xtr+","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseFor.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseFor.js":{"index":61,"hash":"aDRpv9Ysd3A0P68kJrwN","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseForOwn.js"]},"node_modules/browserify-hmr/node_modules/lodash/keys.js":{"index":173,"hash":"AzwEiE+T6QrvlRtU3Z5w","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseForOwn.js","node_modules/browserify-hmr/node_modules/lodash/_getMatchData.js","node_modules/browserify-hmr/node_modules/lodash/assign.js","node_modules/browserify-hmr/node_modules/lodash/_getAllKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/forOwn.js":{"index":159,"hash":"Phxs3xQLZ6eXpzVwNsD+","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseTimes.js":{"index":83,"hash":"vQVHAQOeEJCBfl2Pb7SH","parents":["node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js"]},"node_modules/socket.io-parser/binary.js":{"index":221,"hash":"bAee8RukaXwuD/OeGN6F","parents":["node_modules/socket.io-parser/index.js"]},"node_modules/browser-resolve/empty.js":{"index":33,"hash":"47DEQpj8HBSa+/TImW+5","parents":["node_modules/vue-resource/dist/vue-resource.common.js","node_modules/engine.io-client/lib/transports/websocket.js"]},"node_modules/vue-resource/dist/vue-resource.common.js":{"index":228,"hash":"qGvjhEmYyN0r6atLPOFX","parents":["resources/assets/js/bootstrap.js"]},"node_modules/ms/index.js":{"index":208,"hash":"+i3MPFzut0mh8LK6NCY0","parents":["node_modules/socket.io-client/node_modules/debug/debug.js","node_modules/engine.io-client/node_modules/debug/debug.js"]},"node_modules/socket.io-client/node_modules/debug/debug.js":{"index":220,"hash":"5FZHGx7z7kdbTIz7MyR0","parents":["node_modules/socket.io-client/node_modules/debug/browser.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getMatchData.js":{"index":102,"hash":"QzO7KFepX9S2dqnbKqgt","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatches.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isStrictComparable.js":{"index":120,"hash":"rbCwfHyEpUrj4Z98kqqR","parents":["node_modules/browserify-hmr/node_modules/lodash/_getMatchData.js","node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/_toKey.js":{"index":152,"hash":"Fva7n1CrZYGNyjdfKbt3","parents":["node_modules/browserify-hmr/node_modules/lodash/property.js","node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_baseGet.js","node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/isSymbol.js":{"index":171,"hash":"uIIRbxfQUXadoioCe5+N","parents":["node_modules/browserify-hmr/node_modules/lodash/_toKey.js","node_modules/browserify-hmr/node_modules/lodash/_isKey.js","node_modules/browserify-hmr/node_modules/lodash/_baseToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_basePropertyDeep.js":{"index":79,"hash":"Zfrh9AQz1Ry2yPu2pByv","parents":["node_modules/browserify-hmr/node_modules/lodash/property.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseGet.js":{"index":63,"hash":"EQWKE8NGYTKR53FHpqW6","parents":["node_modules/browserify-hmr/node_modules/lodash/_basePropertyDeep.js","node_modules/browserify-hmr/node_modules/lodash/get.js"]},"node_modules/browserify-hmr/node_modules/lodash/property.js":{"index":177,"hash":"2hJfadtQXM/U3NbWpzGR","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isKey.js":{"index":116,"hash":"D13Ok63JqktDADwmaeBu","parents":["node_modules/browserify-hmr/node_modules/lodash/property.js","node_modules/browserify-hmr/node_modules/lodash/_castPath.js","node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/isObjectLike.js":{"index":170,"hash":"qRO1rf+QsMbu/mjKbljZ","parents":["node_modules/browserify-hmr/node_modules/lodash/isSymbol.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsArguments.js","node_modules/browserify-hmr/node_modules/lodash/isArguments.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsTypedArray.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqual.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseHasIn.js":{"index":66,"hash":"+7Ad7hoG+3kwDHiM0tNn","parents":["node_modules/browserify-hmr/node_modules/lodash/hasIn.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getValue.js":{"index":107,"hash":"ECu3UgrdoHGLOVPWr5mD","parents":["node_modules/browserify-hmr/node_modules/lodash/_getNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/_apply.js":{"index":49,"hash":"XKkzZTghrlK6WTNW2Mdh","parents":["node_modules/browserify-hmr/node_modules/lodash/_overRest.js"]},"node_modules/browserify-hmr/node_modules/lodash/_overRest.js":{"index":139,"hash":"iDNTQ1nLZv3jwCD1fhKA","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseRest.js"]},"node_modules/browserify-hmr/node_modules/lodash/_shortOut.js":{"index":145,"hash":"IoUeHrEOcxqBK99ieVfK","parents":["node_modules/browserify-hmr/node_modules/lodash/_setToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_objectToString.js":{"index":137,"hash":"gcC0LTB2iC1gNln4H3WI","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseGetTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/stubFalse.js":{"index":180,"hash":"bsNH9caMXr7Pdt8ruFJt","parents":["node_modules/browserify-hmr/node_modules/lodash/isBuffer.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseUnary.js":{"index":85,"hash":"cMYMf5ZcCBeLWbK9TQmI","parents":["node_modules/browserify-hmr/node_modules/lodash/isTypedArray.js"]},"node_modules/browserify-hmr/node_modules/lodash/_overArg.js":{"index":138,"hash":"DrVoGwBMK8ywtUgJJMWJ","parents":["node_modules/browserify-hmr/node_modules/lodash/_nativeKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/_nativeKeys.js":{"index":135,"hash":"Ksoa4f854F0/NggsS0Yh","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseKeys.js":{"index":74,"hash":"kmg69OeKnhCzjV1WMGzu","parents":["node_modules/browserify-hmr/node_modules/lodash/keys.js"]},"node_modules/axios/lib/helpers/bind.js":{"index":18,"hash":"7qz63sWc/avguoKZp/Tj","parents":["node_modules/axios/lib/utils.js","node_modules/axios/lib/axios.js"]},"node_modules/axios/lib/cancel/Cancel.js":{"index":7,"hash":"H5p8YXHwES9hf4g5J2Ix","parents":["node_modules/axios/lib/cancel/CancelToken.js","node_modules/axios/lib/axios.js"]},"node_modules/axios/lib/cancel/isCancel.js":{"index":9,"hash":"I1e5Pa4+rYUPP2HOlgqQ","parents":["node_modules/axios/lib/core/dispatchRequest.js","node_modules/axios/lib/axios.js"]},"node_modules/axios/lib/helpers/spread.js":{"index":27,"hash":"tRmNydzwpR2+f97xOT2R","parents":["node_modules/axios/lib/axios.js"]},"node_modules/vue/dist/vue.common.js":{"index":229,"hash":"5vHHdly24d9p5ZBGcbiv","parents":["resources/assets/js/bootstrap.js"]},"node_modules/socket.io-parser/node_modules/ms/index.js":{"index":226,"hash":"HanVKm5AkV6MOdHRAMCT","parents":["node_modules/socket.io-parser/node_modules/debug/debug.js"]},"node_modules/socket.io-parser/node_modules/debug/debug.js":{"index":225,"hash":"yqdR7nJc7wxIHzFDNzG+","parents":["node_modules/socket.io-parser/node_modules/debug/browser.js"]},"node_modules/socket.io-parser/node_modules/debug/browser.js":{"index":224,"hash":"S76q28f1VPJIcCtJn1eq","parents":["node_modules/socket.io-parser/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseGetTag.js":{"index":65,"hash":"ydPbt27q/TAHvOyjdq/H","parents":["node_modules/browserify-hmr/node_modules/lodash/isSymbol.js","node_modules/browserify-hmr/node_modules/lodash/isFunction.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsArguments.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsTypedArray.js","node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hasPath.js":{"index":108,"hash":"H9ddOWkLPRuFYq8fwTEv","parents":["node_modules/browserify-hmr/node_modules/lodash/hasIn.js"]},"node_modules/browserify-hmr/node_modules/lodash/_castPath.js":{"index":89,"hash":"GgKBkmr1sBRSb1yd72qJ","parents":["node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_baseGet.js"]},"node_modules/browserify-hmr/node_modules/lodash/isArguments.js":{"index":163,"hash":"iJIbQ7nb4q+C1riPMj/b","parents":["node_modules/browserify-hmr/node_modules/lodash/_hasPath.js","node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/hasIn.js":{"index":161,"hash":"o6j7gwruD7qKNbgMUe0j","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Symbol.js":{"index":46,"hash":"I77NsH5p3PRVWpJOtN3+","parents":["node_modules/browserify-hmr/node_modules/lodash/_getRawTag.js","node_modules/browserify-hmr/node_modules/lodash/_baseGetTag.js","node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js","node_modules/browserify-hmr/node_modules/lodash/_baseToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_root.js":{"index":140,"hash":"MupxTyUFdnn90wmcJpPL","parents":["node_modules/browserify-hmr/node_modules/lodash/_Symbol.js","node_modules/browserify-hmr/node_modules/lodash/isBuffer.js","node_modules/browserify-hmr/node_modules/lodash/_Map.js","node_modules/browserify-hmr/node_modules/lodash/_Uint8Array.js","node_modules/browserify-hmr/node_modules/lodash/_DataView.js","node_modules/browserify-hmr/node_modules/lodash/_Set.js","node_modules/browserify-hmr/node_modules/lodash/_Promise.js","node_modules/browserify-hmr/node_modules/lodash/_WeakMap.js","node_modules/browserify-hmr/node_modules/lodash/_coreJsData.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getRawTag.js":{"index":104,"hash":"MUL9l/iYFvZaG1vReTH3","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseGetTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/isFunction.js":{"index":167,"hash":"0gysC+rTcZlhPWD04ANh","parents":["node_modules/browserify-hmr/node_modules/lodash/isArrayLike.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsArguments.js":{"index":67,"hash":"caWdwJw13ty+5+1x9erg","parents":["node_modules/browserify-hmr/node_modules/lodash/isArguments.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsTypedArray.js":{"index":72,"hash":"cPl0GH9tkUCpceUV6gAk","parents":["node_modules/browserify-hmr/node_modules/lodash/isTypedArray.js"]},"node_modules/browserify-hmr/node_modules/lodash/_nodeUtil.js":{"index":136,"hash":"a5iiX2Zkv5BTWgreCV8c","parents":["node_modules/browserify-hmr/node_modules/lodash/isTypedArray.js"]},"node_modules/browserify-hmr/node_modules/lodash/_freeGlobal.js":{"index":99,"hash":"JkBVfFsfGmCLIMhuNXD1","parents":["node_modules/browserify-hmr/node_modules/lodash/_nodeUtil.js","node_modules/browserify-hmr/node_modules/lodash/_root.js"]},"node_modules/browserify-hmr/node_modules/lodash/isTypedArray.js":{"index":172,"hash":"pNInOnl/2pKh0f1gDzOT","parents":["node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackDelete.js":{"index":147,"hash":"LXafI5DDGP0wDwfpw8/U","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackGet.js":{"index":148,"hash":"BoHW4uFMtND7Gi+JPdJf","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackHas.js":{"index":149,"hash":"thY5y8jBCnJMfegnSD/V","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_toSource.js":{"index":153,"hash":"qhQsP8sNq2kil796yxWO","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/constant.js":{"index":155,"hash":"E/D07UC1hh81w2R6/inn","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseSetToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseSetToString.js":{"index":81,"hash":"iLxL219sz9iCOrPJz82a","parents":["node_modules/browserify-hmr/node_modules/lodash/_setToString.js"]},"node_modules/browserify-hmr/node_modules/lodash/_defineProperty.js":{"index":95,"hash":"0CbMU6r+0Uq1gikE9oNA","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseSetToString.js","node_modules/browserify-hmr/node_modules/lodash/_baseAssignValue.js"]},"node_modules/browserify-hmr/node_modules/lodash/_setToString.js":{"index":144,"hash":"hu7pnSotmEJV3Wx9OsJa","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseRest.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseRest.js":{"index":80,"hash":"SUX2Uj3EprmvmkcHcoY/","parents":["node_modules/browserify-hmr/node_modules/lodash/_createAssigner.js"]},"node_modules/browserify-hmr/node_modules/lodash/_createAssigner.js":{"index":92,"hash":"JEqSu7xxpSyH40Y4GJ+V","parents":["node_modules/browserify-hmr/node_modules/lodash/assign.js"]},"node_modules/browserify-hmr/node_modules/lodash/isBuffer.js":{"index":166,"hash":"Uzhm1jNtW1f55Gsz24+8","parents":["node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayLikeKeys.js":{"index":52,"hash":"RWu/FT9WAfaDXPoucuiD","parents":["node_modules/browserify-hmr/node_modules/lodash/keys.js"]},"node_modules/browserify-hmr/node_modules/lodash/assign.js":{"index":154,"hash":"6X7UP3eqxcj6o2ias2ID","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/axios/lib/utils.js":{"index":28,"hash":"iAJPkkHOoTQ0lV9mgUDF","parents":["node_modules/axios/lib/helpers/normalizeHeaderName.js","node_modules/axios/lib/core/InterceptorManager.js","node_modules/axios/lib/helpers/isURLSameOrigin.js","node_modules/axios/lib/helpers/buildURL.js","node_modules/axios/lib/helpers/parseHeaders.js","node_modules/axios/lib/helpers/cookies.js","node_modules/axios/lib/core/transformData.js","node_modules/axios/lib/core/dispatchRequest.js","node_modules/axios/lib/core/Axios.js","node_modules/axios/lib/adapters/xhr.js","node_modules/axios/lib/defaults.js","node_modules/axios/lib/axios.js"]},"node_modules/axios/lib/cancel/CancelToken.js":{"index":8,"hash":"FHNSerik6mTW7UK588b6","parents":["node_modules/axios/lib/axios.js"]},"node_modules/engine.io-client/node_modules/component-emitter/index.js":{"index":196,"hash":"oN00wp8CctwYNQv6ryzF","parents":["node_modules/engine.io-client/lib/transport.js","node_modules/engine.io-client/lib/transports/polling-xhr.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/axios/lib/helpers/isAbsoluteURL.js":{"index":23,"hash":"vVWCDPr+MX6lpqXv8pbV","parents":["node_modules/axios/lib/core/Axios.js"]},"node_modules/axios/lib/helpers/combineURLs.js":{"index":21,"hash":"WcVx/KakaTKJx+B4Oqlg","parents":["node_modules/axios/lib/core/Axios.js"]},"node_modules/parseqs/index.js":{"index":210,"hash":"bFhhlHvfi+om+FJQz11d","parents":["node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/parsejson/index.js":{"index":209,"hash":"wxV8aXhg9hh6MyO+FO0c","parents":["node_modules/engine.io-client/lib/socket.js"]},"node_modules/engine.io-parser/lib/keys.js":{"index":200,"hash":"oFyKNTA0twlyQVhVzp9n","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackClear.js":{"index":146,"hash":"ibWAz8K0fFq6Bb0SS4B7","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_ListCache.js":{"index":39,"hash":"KxC/aKLlcuOS+PWx1HyP","parents":["node_modules/browserify-hmr/node_modules/lodash/_stackClear.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheClear.js","node_modules/browserify-hmr/node_modules/lodash/_stackSet.js","node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheClear.js":{"index":121,"hash":"CHLB/DjalyhgxdfpsCnW","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_cacheHas.js":{"index":87,"hash":"zwJaX7fkgHAdYeTtYO2G","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalArrays.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapToArray.js":{"index":131,"hash":"XUQTl0anVZnXaUOrmxD7","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_setToArray.js":{"index":143,"hash":"gUyAUZoZS3v/gnhOBsLW","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js"]},"node_modules/axios/lib/helpers/normalizeHeaderName.js":{"index":25,"hash":"ZOnEbUQ4gAqyOWXM/MJz","parents":["node_modules/axios/lib/defaults.js"]},"node_modules/axios/lib/core/InterceptorManager.js":{"index":11,"hash":"eKcTD61ZQvp+fRuqC8MM","parents":["node_modules/axios/lib/core/Axios.js"]},"node_modules/axios/lib/helpers/btoa.js":{"index":19,"hash":"50rlLXO/5hRkYfgSsE36","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/engine.io-client/lib/transport.js":{"index":189,"hash":"mp7fZlClWfLgH++23uT2","parents":["node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/engine.io-parser/lib/browser.js":{"index":199,"hash":"Oa/D6NTXKCm7QJPlaAXe","parents":["node_modules/engine.io-client/lib/transport.js","node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/socket.js","node_modules/engine.io-client/lib/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheDelete.js":{"index":122,"hash":"o3YDg6klGWlCS2PgzZy+","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_assocIndexOf.js":{"index":57,"hash":"+YtyXqBKKXnwrSmv/2eU","parents":["node_modules/browserify-hmr/node_modules/lodash/_listCacheDelete.js","node_modules/browserify-hmr/node_modules/lodash/_listCacheHas.js","node_modules/browserify-hmr/node_modules/lodash/_listCacheSet.js","node_modules/browserify-hmr/node_modules/lodash/_listCacheGet.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheHas.js":{"index":124,"hash":"2tu2JqPxTVjaJm/WbeGw","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheSet.js":{"index":125,"hash":"dVcwdgHP8vQHHPnX+pql","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Map.js":{"index":40,"hash":"aezyd9/dXR4WmT/cJk4B","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheClear.js","node_modules/browserify-hmr/node_modules/lodash/_stackSet.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getNative.js":{"index":103,"hash":"c5Ljj0yzzW4dPj+JomYZ","parents":["node_modules/browserify-hmr/node_modules/lodash/_Map.js","node_modules/browserify-hmr/node_modules/lodash/_DataView.js","node_modules/browserify-hmr/node_modules/lodash/_Set.js","node_modules/browserify-hmr/node_modules/lodash/_Promise.js","node_modules/browserify-hmr/node_modules/lodash/_WeakMap.js","node_modules/browserify-hmr/node_modules/lodash/_defineProperty.js","node_modules/browserify-hmr/node_modules/lodash/_nativeCreate.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Uint8Array.js":{"index":47,"hash":"Zc6+hCmhnXc0Y6Asmckn","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js":{"index":97,"hash":"5sdsIGyCGshbuSoIxoXa","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_equalArrays.js":{"index":96,"hash":"FLnT7PvdDDobU/p0ty8u","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalByTag.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_DataView.js":{"index":37,"hash":"N7jUbJyl5TusFXojFUuz","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Set.js":{"index":43,"hash":"BRcgMZjGEVgVhv4GaR6q","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Promise.js":{"index":42,"hash":"T4OR1RtxAOTYyC9xrI13","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_WeakMap.js":{"index":48,"hash":"iuNSA30LsHH/h10pNsQ6","parents":["node_modules/browserify-hmr/node_modules/lodash/_getTag.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getTag.js":{"index":106,"hash":"rZSqomckxeMx8IEK6dQG","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_coreJsData.js":{"index":91,"hash":"mWDHPw3O0bwyURVR4xz+","parents":["node_modules/browserify-hmr/node_modules/lodash/_isMasked.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isMasked.js":{"index":118,"hash":"vCLMgg9t+moWMD2eCyQw","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsNative.js":{"index":71,"hash":"HplAaZjQs9R/bNG2XV0a","parents":["node_modules/browserify-hmr/node_modules/lodash/_getNative.js"]},"node_modules/browserify-hmr/node_modules/lodash/mapValues.js":{"index":175,"hash":"wGzYh7rOmnr5NbNf31Xh","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_setCacheAdd.js":{"index":141,"hash":"yUbHLrOe8uWgSDa2EOmH","parents":["node_modules/browserify-hmr/node_modules/lodash/_SetCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_setCacheHas.js":{"index":142,"hash":"aSivpixRq6mV4rYXkVzt","parents":["node_modules/browserify-hmr/node_modules/lodash/_SetCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_SetCache.js":{"index":44,"hash":"DKcn0VM+nqBtuxUGd3JS","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalArrays.js"]},"node_modules/browserify-hmr/node_modules/lodash/_MapCache.js":{"index":41,"hash":"XbhLy8omrsa87tk7GrBc","parents":["node_modules/browserify-hmr/node_modules/lodash/_SetCache.js","node_modules/browserify-hmr/node_modules/lodash/memoize.js","node_modules/browserify-hmr/node_modules/lodash/_stackSet.js"]},"node_modules/axios/lib/helpers/isURLSameOrigin.js":{"index":24,"hash":"Q23gyeHuCUz6urO9LiH6","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/helpers/buildURL.js":{"index":20,"hash":"/NGEKCSjJtQmLL9YgQ19","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/helpers/parseHeaders.js":{"index":26,"hash":"RSaxrIhXzzKyKZUYYMuV","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/helpers/cookies.js":{"index":22,"hash":"bosLflNojvUQNanxX8Ou","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/core/settle.js":{"index":15,"hash":"oBiMdGYIWstYzLllkvdc","parents":["node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/core/createError.js":{"index":12,"hash":"gewqDvLDQxuCJgfCZVcg","parents":["node_modules/axios/lib/core/settle.js","node_modules/axios/lib/adapters/xhr.js"]},"node_modules/axios/lib/core/transformData.js":{"index":16,"hash":"ogPxBrH/+f25p5LI/dDI","parents":["node_modules/axios/lib/core/dispatchRequest.js"]},"node_modules/axios/lib/core/dispatchRequest.js":{"index":13,"hash":"HtiwIy/HS1A24N/qgh+i","parents":["node_modules/axios/lib/core/Axios.js"]},"node_modules/axios/lib/defaults.js":{"index":17,"hash":"qltyCvzMIprq5m6tzw01","parents":["node_modules/axios/lib/core/dispatchRequest.js","node_modules/axios/lib/core/Axios.js","node_modules/axios/lib/axios.js"]},"node_modules/axios/lib/core/Axios.js":{"index":10,"hash":"Y6SCtUi9Dxs62r8mPrVj","parents":["node_modules/axios/lib/axios.js"]},"node_modules/wtf-8/wtf-8.js":{"index":230,"hash":"k6X632uKvHp6yK4OCn1D","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/arraybuffer.slice/index.js":{"index":3,"hash":"RSb5Zx9CgX3adjzbvf/k","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/after/index.js":{"index":2,"hash":"NzPfXWECmM8rW/6fdkcj","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/blob/index.js":{"index":31,"hash":"q7L6uHK9eN9yEvDVNxJw","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/axios/lib/core/enhanceError.js":{"index":14,"hash":"jQgfNs13AFaI52OMk6Uz","parents":["node_modules/axios/lib/core/createError.js"]},"node_modules/axios/lib/adapters/xhr.js":{"index":5,"hash":"aAqW8YO7v3QEaiiYtYs7","parents":["node_modules/axios/lib/defaults.js","node_modules/axios/lib/defaults.js"]},"node_modules/axios/lib/axios.js":{"index":6,"hash":"HIDoC1nh7uFupiQwyIon","parents":["node_modules/axios/index.js"]},"node_modules/axios/index.js":{"index":4,"hash":"i3hbSNtq55ltbO/Ev0Ye","parents":["resources/assets/js/bootstrap.js"]},"resources/assets/js/bootstrap.js":{"index":233,"hash":"civuKYHzjpqeT4fMpDVk","parents":["resources/assets/js/app.js"]},"resources/assets/js/app.js":{"index":232,"hash":"l4SrkFRHoB/r64iqx3PD","parents":[]},"node_modules/base64-arraybuffer/lib/base64-arraybuffer.js":{"index":30,"hash":"8XSfHUrJJCZLdLVRE4Xb","parents":["node_modules/engine.io-parser/lib/browser.js"]},"node_modules/has-cors/index.js":{"index":202,"hash":"HwTb4UF/S089ZYA8hrRl","parents":["node_modules/engine.io-client/lib/xmlhttprequest.js"]},"node_modules/engine.io-client/lib/xmlhttprequest.js":{"index":195,"hash":"bdorKhduNvEqwPS8Ryma","parents":["node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/transports/polling-xhr.js","node_modules/engine.io-client/lib/transports/index.js"]},"node_modules/browserify-hmr/node_modules/lodash/_listCacheGet.js":{"index":123,"hash":"SZAC3U/+BLssJw9WKbhb","parents":["node_modules/browserify-hmr/node_modules/lodash/_ListCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheHas.js":{"index":129,"hash":"S0HdvBVxOySQIIMRmtf0","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getMapData.js":{"index":101,"hash":"ZdeLudBY90L64kFsAIQL","parents":["node_modules/browserify-hmr/node_modules/lodash/_mapCacheHas.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheGet.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheSet.js","node_modules/browserify-hmr/node_modules/lodash/_mapCacheDelete.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheGet.js":{"index":128,"hash":"dglUiNgT6mYn3/TLOqMD","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheSet.js":{"index":130,"hash":"Rk8Cf6ZeJaOWzM2bXiED","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseToString.js":{"index":84,"hash":"AnA1FrHVlMlph8hPfQFk","parents":["node_modules/browserify-hmr/node_modules/lodash/toString.js"]},"node_modules/browserify-hmr/node_modules/lodash/toString.js":{"index":181,"hash":"u6lNu4mjQVTOavtG4Hpr","parents":["node_modules/browserify-hmr/node_modules/lodash/_castPath.js"]},"node_modules/browserify-hmr/node_modules/lodash/_arrayPush.js":{"index":54,"hash":"/EQp182bKyQYd9DyjHRq","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseGetAllKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseGetAllKeys.js":{"index":64,"hash":"G/yC9530/ahn/dgrrslT","parents":["node_modules/browserify-hmr/node_modules/lodash/_getAllKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/stubArray.js":{"index":179,"hash":"hpV3ZtG8dCYBLEBt0XqS","parents":["node_modules/browserify-hmr/node_modules/lodash/_getSymbols.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getSymbols.js":{"index":105,"hash":"PoUL82x850fu8UHfzZjw","parents":["node_modules/browserify-hmr/node_modules/lodash/_getAllKeys.js"]},"node_modules/browserify-hmr/node_modules/lodash/_getAllKeys.js":{"index":100,"hash":"3JYThcdBa6xFuMLEJAcf","parents":["node_modules/browserify-hmr/node_modules/lodash/_equalObjects.js"]},"node_modules/browserify-hmr/node_modules/lodash/_equalObjects.js":{"index":98,"hash":"Rc9NYU8R1s/bWUnUOXOJ","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js":{"index":69,"hash":"a5Qj+02BWo5995Nobe+v","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqual.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Stack.js":{"index":45,"hash":"/wytiRFlfgg4krF9Qz6a","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIsEqualDeep.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsMatch.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsEqual.js":{"index":68,"hash":"IfD9jeZw2S45+s0BZ1L3","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js","node_modules/browserify-hmr/node_modules/lodash/_baseIsMatch.js"]},"node_modules/engine.io-client/lib/transports/polling-jsonp.js":{"index":191,"hash":"oEkG83OYr+yF9+O6KIZU","parents":["node_modules/engine.io-client/lib/transports/index.js"]},"node_modules/engine.io-client/lib/transports/polling.js":{"index":193,"hash":"iR9NdLeAEs8vSYk/mMqT","parents":["node_modules/engine.io-client/lib/transports/polling-jsonp.js","node_modules/engine.io-client/lib/transports/polling-xhr.js"]},"node_modules/component-inherit/index.js":{"index":185,"hash":"T0Fqch4d4akvlr8bh7lc","parents":["node_modules/engine.io-client/lib/transports/polling-jsonp.js","node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/transports/polling-xhr.js"]},"node_modules/yeast/index.js":{"index":231,"hash":"ZM3+5w4l/D2f6x7svySF","parents":["node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js"]},"node_modules/engine.io-client/lib/transports/websocket.js":{"index":194,"hash":"T9c/ggKNrbmnrHTUqZ8f","parents":["node_modules/engine.io-client/lib/transports/index.js"]},"node_modules/engine.io-client/node_modules/debug/browser.js":{"index":197,"hash":"Q9ewCSPMnJcAJRPsyk4r","parents":["node_modules/engine.io-client/lib/transports/websocket.js","node_modules/engine.io-client/lib/transports/polling.js","node_modules/engine.io-client/lib/transports/polling-xhr.js","node_modules/engine.io-client/lib/socket.js"]},"node_modules/engine.io-client/node_modules/debug/debug.js":{"index":198,"hash":"5FZHGx7z7kdbTIz7MyR0","parents":["node_modules/engine.io-client/node_modules/debug/browser.js"]},"node_modules/browserify-hmr/node_modules/lodash/memoize.js":{"index":176,"hash":"avTk3nhklvyvSxLNiUwd","parents":["node_modules/browserify-hmr/node_modules/lodash/_memoizeCapped.js"]},"node_modules/browserify-hmr/node_modules/lodash/_memoizeCapped.js":{"index":133,"hash":"HacnckK3nw4vtSYbX7i/","parents":["node_modules/browserify-hmr/node_modules/lodash/_stringToPath.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stringToPath.js":{"index":151,"hash":"nTlFZDUaGsY0w/l3Daka","parents":["node_modules/browserify-hmr/node_modules/lodash/_castPath.js"]},"node_modules/browserify-hmr/node_modules/lodash/get.js":{"index":160,"hash":"l8Xm0+dbrUDVfD0OVsKH","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseMatchesProperty.js":{"index":77,"hash":"JUSg/+I63FvjCRBMWDG8","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hashDelete.js":{"index":110,"hash":"CmVwjIdw4ONOgfUyiaMT","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_isKeyable.js":{"index":117,"hash":"NQsK9iVUkTA1EsHPdaK1","parents":["node_modules/browserify-hmr/node_modules/lodash/_getMapData.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheDelete.js":{"index":127,"hash":"Y2RLt8NGt0Im9c9uXXcS","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/engine.io-client/lib/transports/polling-xhr.js":{"index":192,"hash":"4NXW28jfIrijZLTpANlT","parents":["node_modules/engine.io-client/lib/transports/index.js"]},"node_modules/engine.io-client/lib/transports/index.js":{"index":190,"hash":"oFkQ4RgDHQJ8Ae5piZNj","parents":["node_modules/engine.io-client/lib/socket.js"]},"node_modules/engine.io-client/lib/socket.js":{"index":188,"hash":"kT2TeXgVs1CyKphjblzf","parents":["node_modules/engine.io-client/lib/index.js"]},"node_modules/engine.io-client/lib/index.js":{"index":187,"hash":"G6QYuSNu0EcS+G5tR9NE","parents":["node_modules/engine.io-client/index.js"]},"node_modules/engine.io-client/index.js":{"index":186,"hash":"TaZh2zcEs5+SiarJ3uJN","parents":["node_modules/socket.io-client/lib/manager.js"]},"node_modules/socket.io-client/lib/manager.js":{"index":214,"hash":"ea8fbXBXjC66BIPF5Pam","parents":["node_modules/socket.io-client/lib/index.js"]},"node_modules/socket.io-client/lib/index.js":{"index":213,"hash":"s/15kyEjN0kWB5dYl/1h","parents":[]},"node_modules/browserify-hmr/node_modules/lodash/_hashGet.js":{"index":111,"hash":"dc0CR5GuEuyIhxwkyCwj","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_nativeCreate.js":{"index":134,"hash":"QnEWfxsVWqcrQRLl5xaD","parents":["node_modules/browserify-hmr/node_modules/lodash/_hashGet.js","node_modules/browserify-hmr/node_modules/lodash/_hashHas.js","node_modules/browserify-hmr/node_modules/lodash/_hashSet.js","node_modules/browserify-hmr/node_modules/lodash/_hashClear.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hashHas.js":{"index":112,"hash":"fr70n7H4vKHBcQoEXEpO","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hashSet.js":{"index":113,"hash":"GANy9myYOl9CQUX6Hi+w","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_hashClear.js":{"index":109,"hash":"2feZ9hRgUzW8Djw0JrqE","parents":["node_modules/browserify-hmr/node_modules/lodash/_Hash.js"]},"node_modules/browserify-hmr/node_modules/lodash/_Hash.js":{"index":38,"hash":"hTyKHFwLDhT8hzgE2zlD","parents":["node_modules/browserify-hmr/node_modules/lodash/_mapCacheClear.js"]},"node_modules/browserify-hmr/node_modules/lodash/_mapCacheClear.js":{"index":126,"hash":"6D5+Bp90PNozl9Vr8wu2","parents":["node_modules/browserify-hmr/node_modules/lodash/_MapCache.js"]},"node_modules/browserify-hmr/node_modules/lodash/_stackSet.js":{"index":150,"hash":"rFq/zAhyEaIffTCH45Gf","parents":["node_modules/browserify-hmr/node_modules/lodash/_Stack.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseIsMatch.js":{"index":70,"hash":"yrF79Y2F5RiVXHPZgzhK","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseMatches.js"]},"node_modules/browserify-hmr/node_modules/lodash/_baseMatches.js":{"index":76,"hash":"eM6GzX+YFfSSvWUut1RW","parents":["node_modules/browserify-hmr/node_modules/lodash/_baseIteratee.js"]},"node_modules/browserify-hmr/node_modules/lodash/some.js":{"index":178,"hash":"o5R2DTe3L0fWtByoF6NK","parents":["node_modules/browserify-hmr/inc/index.js"]},"node_modules/browserify-hmr/inc/index.js":{"index":34,"hash":"MGH8WksqsFtrirdPnhgt","parents":[]}};
   var originalEntries = ["/home/htdocs/laravel-starter-kit/resources/assets/js/app.js"];
   var updateUrl = null;
   var updateMode = "websocket";
@@ -56138,6 +57484,6 @@ $(document).on('keyup', '#search-filter', function (e) {
   arguments[3], arguments[4], arguments[5], arguments[6]
 );
 
-},{"./node_modules/browserify-hmr/inc/index.js":34,"./node_modules/socket.io-client/lib/index.js":213,"/home/htdocs/laravel-starter-kit/resources/assets/js/app.js":231}]},{},[1]);
+},{"./node_modules/browserify-hmr/inc/index.js":34,"./node_modules/socket.io-client/lib/index.js":213,"/home/htdocs/laravel-starter-kit/resources/assets/js/app.js":232}]},{},[1]);
 
 //# sourceMappingURL=app.js.map
