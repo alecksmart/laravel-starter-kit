@@ -108,9 +108,17 @@ class UserManagerController extends Controller
      * @param  int  $id user id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        User::find($id)->delete();
+        $currentUser = $request->user();
+        $user = User::find($id);
+
+        if ($currentUser->id == $user->id) {
+            // 403 - unauthorized action
+            return response()->json(['_common' => ['You cannot edit yourself, period.']], 403);
+        }
+
+        $user->delete();
         return response()->json(['done']);
     }
 }

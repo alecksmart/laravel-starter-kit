@@ -3,6 +3,7 @@
  */
 
 const toastr = require('toastr');
+
 window._managers.usersManager = () => {
   new Vue({
     el: '#manage-vue',
@@ -79,9 +80,16 @@ window._managers.usersManager = () => {
         });
       },
       deleteItem: function (item) {
+        if (!confirm('Are you sure?')) {
+          return false;
+        }
         this.$http.delete('/manage/users/' + item.id).then((response) => {
           this.changePage(this.pagination.current_page);
           toastr.success('Item Deleted Successfully.', 'Success Alert', {
+            timeOut: 5000
+          });
+        }, (response) => {
+          response.data['_common'] && toastr.error(response.data['_common'].join('<br>'), 'Error', {
             timeOut: 5000
           });
         });
