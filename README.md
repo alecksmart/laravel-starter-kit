@@ -5,6 +5,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 # Features
 
 * Laravel
+* vue.js
 * MySQL migrations
 * Bootstrap, jQuery
 * Users, auth and roles

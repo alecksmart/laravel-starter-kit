@@ -13,21 +13,25 @@ use \App\Post;
 |
 */
 
+// General display
 Route::get('/', 'BlogController@index');
-
-Auth::routes();
-
 Route::get('/home', 'HomeController@index');
-
+Auth::routes();
 Route::get('/post/{post_slug}', [
      'post_slug' => 'post_slug',
      'uses'     => 'PostsController@show'
 ]);
-Route::patch('/posts/unhide', 'PostsController@unhide');
-Route::patch('/posts/approve', 'PostsController@approve');
-Route::resource('posts', 'PostsController');
-Route::patch('/comments/unhide', 'CommentsController@unhide');
-Route::resource('comments', 'CommentsController');
+// User-related
 Route::get('/myaccount', 'UsersController@account');
 Route::post('/myaccount', 'UsersController@save');
 Route::post('/user/avatar', 'UsersController@avatar');
+
+// Manage usesr
+Route::resource('/manage/users', 'UserManagerController');
+
+
+//Route::patch('/posts/unhide', 'PostsController@unhide');
+//Route::patch('/posts/approve', 'PostsController@approve');
+//Route::resource('posts', 'PostsController');
+//Route::patch('/comments/unhide', 'CommentsController@unhide');
+//Route::resource('comments', 'CommentsController');
