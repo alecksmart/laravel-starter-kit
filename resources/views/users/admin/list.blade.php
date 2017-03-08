@@ -71,38 +71,55 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-          <h4 class="modal-title" id="myModalLabel">Create Item</h4> </div>
+          <h4 class="modal-title" id="myModalLabel">Create New</h4> </div>
         <div class="modal-body">
           <form method="POST" enctype="multipart/form-data" v-on:submit.prevent="createItem">
+
             <div class="form-group">
-              <label for="title">Title:</label>
-              <input type="text" name="title" class="form-control" v-model="newItem.title" /> <span v-if="formErrors['title']" class="error text-danger">@{{ formErrors['title'] }}</span> </div>
+              <label for="name">Name:</label>
+              <input type="text" name="name" class="form-control" v-model="newItem.name" /> <span v-if="formErrors['name']" class="error text-danger">@{{ formErrors['name'] }}</span>
+            </div>
+
             <div class="form-group">
-              <label for="title">Description:</label>
-              <textarea name="description" class="form-control" v-model="newItem.description"></textarea> <span v-if="formErrors['description']" class="error text-danger">@{{ formErrors['description'] }}</span> </div>
+              <label for="email">Email:</label>
+              <input type="text" name="email" class="form-control" v-model="newItem.email" /> <span v-if="formErrors['email']" class="error text-danger">@{{ formErrors['email'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input type="text" name="password" class="form-control" v-model="newItem.password" /> <span v-if="formErrors['password']" class="error text-danger">@{{ formErrors['password'] }}</span>
+            </div>
+
             <div class="form-group">
               <button type="submit" class="btn btn-success">Submit</button>
             </div>
+
           </form>
         </div>
       </div>
     </div>
   </div>
+
   <!-- Edit Item Modal -->
   <div class="modal fade" id="edit-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-          <h4 class="modal-title" id="myModalLabel">Edit Item</h4> </div>
+          <h4 class="modal-title" id="myModalLabel">Edit</h4> </div>
         <div class="modal-body">
           <form method="POST" enctype="multipart/form-data" v-on:submit.prevent="updateItem(fillItem.id)">
+
             <div class="form-group">
-              <label for="title">Title:</label>
-              <input type="text" name="title" class="form-control" v-model="fillItem.title" /> <span v-if="formErrorsUpdate['title']" class="error text-danger">@{{ formErrorsUpdate['title'] }}</span> </div>
+              <label for="name">Name:</label>
+              <input type="text" name="name" class="form-control" v-model="fillItem.name" /> <span v-if="formErrorsUpdate['name']" class="error text-danger">@{{ formErrorsUpdate['name'] }}</span>
+            </div>
+
             <div class="form-group">
-              <label for="title">Description:</label>
-              <textarea name="description" class="form-control" v-model="fillItem.description"></textarea> <span v-if="formErrorsUpdate['description']" class="error text-danger">@{{ formErrorsUpdate['description'] }}</span> </div>
+              <label for="email">Email:</label>
+              <input type="text" name="email" class="form-control" v-model="fillItem.email" /> <span v-if="formErrorsUpdate['email']" class="error text-danger">@{{ formErrorsUpdate['email'] }}</span>
+            </div>
+
             <div class="form-group">
               <button type="submit" class="btn btn-success">Submit</button>
             </div>
