@@ -8,11 +8,15 @@
       <div class="pull-left">
         <h2>Manage Users</h2>
       </div>
-      <div class="pull-right">
-        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item"> New User </button>
-      </div>
     </div>
   </div>
+
+  <!-- New Item Controls  -->
+
+  <div class="pull-right">
+    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#create-item"> New User </button>
+  </div>
+
   <!-- Item Listing -->
 
   <div class="card">
@@ -35,8 +39,10 @@
             <td>@{{ item.email }}</td>
             <td>@{{ item.role }}</td>
             <td>
-              <button class="btn btn-primary btn-xs" data-title="Edit" @click.prevent="editItem(item)"><span class="glyphicon glyphicon-pencil"></span></button>
-              <button class="btn btn-danger btn-xs" data-title="Delete" @click.prevent="deleteItem(item)"><span class="glyphicon glyphicon-trash"></span></button>
+              <p class="text-center">
+                <button class="btn btn-primary btn-xs" data-title="Edit" @click.prevent="editItem(item)"><span class="glyphicon glyphicon-pencil"></span></button>
+                <button class="btn btn-danger btn-xs" data-title="Delete" @click.prevent="deleteItem(item)"><span class="glyphicon glyphicon-trash"></span></button>
+              </p>
             </td>
           </tr>
         </tbody>
@@ -48,7 +54,8 @@
           <li v-if="pagination.current_page > 1">
             <a href="#" aria-label="Previous" @click.prevent="changePage(pagination.current_page - 1)"> <span aria-hidden="true">«</span> </a>
           </li>
-          <li v-for="page in pagesNumber" v-bind:class="[ page == isActived ? 'active' : '']"> <a href="#" @click.prevent="changePage(page)">@{{ page }}</a> </li>
+          <li v-for="page in pagesNumber" v-bind:class="[ page == isActived ? 'active' : '']"> <a href="#" @click.prevent="changePage(page)">@{{ page }}</a>
+          </li>
           <li v-if="pagination.current_page < pagination.last_page">
             <a href="#" aria-label="Next" @click.prevent="changePage(pagination.current_page + 1)"> <span aria-hidden="true">»</span> </a>
           </li>
@@ -57,8 +64,6 @@
 
     </div>
   </div>
-
-
 
   <!-- Create Item Modal -->
   <div class="modal fade" id="create-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
