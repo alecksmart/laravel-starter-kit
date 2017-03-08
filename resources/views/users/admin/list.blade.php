@@ -89,12 +89,10 @@
 </div>
 
 @push('scripts')
-<script>
-  $(document).ready(function(){
-    window._managers.usersManager
-      && window._managers.usersManager();
-  });
-</script>
+$(document).ready(function(){
+  window._managers.usersManager
+    && window._managers.usersManager();
+});
 @endpush
 
 @endsection

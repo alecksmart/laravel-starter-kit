@@ -59,12 +59,13 @@
         </nav>
         @yield('content')
     </div>
-    <!-- Scripts -->
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-    <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
-    <script src="{{ asset('js/app.js') }}"></script>
 
-    @stack('scripts')
-
+<!-- Scripts -->
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+<script src="{{ asset('js/app.js') }}"></script>
+<script>
+@stack('scripts')
+</script>
 </body>
 </html>
