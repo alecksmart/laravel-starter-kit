@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 class UserManagerController extends Controller
 {
@@ -41,7 +42,7 @@ class UserManagerController extends Controller
             abort(403, 'Unauthorized action');
         }
 
-        $items = User::latest()->paginate(5);
+        $items = User::latest()->paginate(Config::get('constants.PAGINATE_RECORDS_PER_PAGE'));
 
         $response = [
             'pagination' => [
