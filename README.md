@@ -15,6 +15,8 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 
 - [ ] Release for Laravel 5.4
 - [ ] Unit testing (karma, phpUnit, Behat)
+- [ ] Feature: search field for all lists
+- [ ] Feature: hard delete for all views (invoking MySQL transactions)
 - [ ] Workflow Tutorial
 
 # Pre-requisites
