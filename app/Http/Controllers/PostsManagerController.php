@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Post;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use App\Services\Slug;
 
-class UserManagerController extends Controller
+class PostsManagerController extends Controller
 {
     /**
      * All all actions require a user to be logged in...
@@ -25,10 +27,10 @@ class UserManagerController extends Controller
      */
     public function list()
     {
-        if (Gate::denies('manage-users-list')) {
+        if (Gate::denies('manage-posts')) {
             abort(403, 'Unauthorized action');
         }
-        return view('users.admin.list');
+        return view('posts.admin.list');
     }
 
     /**
@@ -38,11 +40,11 @@ class UserManagerController extends Controller
      */
     public function index()
     {
-        if (Gate::denies('manage-users-list')) {
+        if (Gate::denies('manage-posts')) {
             abort(403, 'Unauthorized action');
         }
 
-        $items = User::latest()->paginate(Config::get('constants.PAGINATE_RECORDS_PER_PAGE'));
+        $items = Post::withTrashed()->latest()->paginate(Config::get('constants.PAGINATE_RECORDS_PER_PAGE'));
 
         $response = [
             'pagination' => [
@@ -62,69 +64,69 @@ class UserManagerController extends Controller
     /**
      * Store a newly created resource in storage.
      *
+     * @param App\Services\Slug $slug
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Slug $slug, Request $request)
     {
-        if (Gate::denies('manage-users-create')) {
+        if (Gate::denies('manage-posts')) {
             abort(403, 'Unauthorized action');
         }
 
         $this->validate($request, [
-            'name'     => 'required|max:100',
-            'email'    => 'required|max:100|email|unique:users',
-            'role'     => 'required|in:admin,moderator,user',
-            'password' => 'required|max:100',
+            'post_title' => 'required|max:255',
+            'post_body' => 'required',
         ]);
 
-        $create = User::create($request->all());
-        return response()->json($create);
+        $post = new Post();
+        $post->user_id     = $request->user()->id;
+        $post->post_title  = $request->get('post_title');
+        $post->post_slug   = $slug->createSlug($request->get('post_title'));
+        $post->post_body   = $request->get('post_body');
+        $post->is_approved = true;
+        $post->created_at  = new \DateTime();
+        $post->save();
+
+        return response()->json($post);
     }
 
     /**
      * Update the specified resource in storage.
      *
+     * @param App\Services\Slug $slug
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id user id
+     * @param  int  $id    post id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Slug $slug, Request $request, $id)
     {
         if (Gate::denies('manage-users-update')) {
             abort(403, 'Unauthorized action');
         }
 
-        $user = User::find($id);
+        $post = Post::withTrashed()->find($id);
 
-        if ($request->user()->id == $user->id) {
-            // 403 - unauthorized action
-            return response()->json(['_common' => ['You cannot edit yourself, period']], 403);
-        }
+        $this->validate($request, [
+            'post_title' => 'required|max:255',
+            'post_body' => 'required',
+        ]);
 
-        $rules = [
-            'name'     => 'required|max:100',
-            'role'     => 'required|in:admin,moderator,user',
-        ];
-
-        // validate email change
-        if ($request->get('email') !== $user->email) {
-            $rules['email'] = 'required|max:100|email|unique:users';
-        }
-        // validate password if it arrives
-        if ($request->get('password')) {
-            $rules['password'] = 'required|max:100';
-        }
         $this->validate($request, $rules);
 
-        $user->update($request->all());
-        return response()->json($user);
+        $post->post_title  = $request->get('post_title');
+        $post->post_slug   = $slug->createSlug($request->get('post_title'));
+        $post->post_body   = $request->get('post_body');
+        $post->is_approved = $request->get('is_approved');
+        $post->update();
+
+        return response()->json($post);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id user id
+     * @param  int  $id post id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, $id)
@@ -133,14 +135,8 @@ class UserManagerController extends Controller
             abort(403, 'Unauthorized action');
         }
 
-        $user = User::find($id);
-
-        if ($request->user()->id == $user->id) {
-            // 403 - unauthorized action
-            return response()->json(['_common' => ['You cannot edit yourself, period']], 403);
-        }
-
-        $user->delete();
+        $post = Post::withTrashed()->find($id);
+        $post->delete();
         return response()->json(['done']);
     }
 }
