@@ -50,7 +50,6 @@ We will try to keep this up-to-date. At the moment of writing, the latest Larave
 
 ## ToDo
 
-- [ ] Release for Laravel 5.4
 - [ ] Unit testing (karma, phpUnit, Behat)
 - [ ] Feature: search field for all lists
 - [ ] Feature: hard delete for all views (invoking MySQL transactions)
