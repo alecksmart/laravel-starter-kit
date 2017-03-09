@@ -17,6 +17,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 - [ ] Unit testing (karma, phpUnit, Behat)
 - [ ] Feature: search field for all lists
 - [ ] Feature: hard delete for all views (invoking MySQL transactions)
+- [ ] Minor: pagination last and first page when available
 - [ ] Workflow Tutorial
 
 # Pre-requisites
