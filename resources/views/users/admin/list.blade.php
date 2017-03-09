@@ -6,7 +6,7 @@
     <div class="row">
       <div class="col-lg-12 margin-tb">
         <div class="pull-left">
-          <h2>Manage Comments</h2>
+          <h2>Manage Users</h2>
         </div>
       </div>
     </div>
@@ -15,43 +15,35 @@
 
   <!-- New Item Controls  -->
 
-  <!--div class="pull-right">
+  <div class="pull-right">
     <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#create-item"><span class="glyphicon glyphicon-new-window"></span> New </button>
-  </div-->
+  </div>
 
   <!-- Item Listing -->
 
   <div class="card">
     <div class="card-header"><i class="fa fa-align-justify"></i>
-      List of Comments
+      List of Users
     </div>
     <div class="card-block">
       <table class="table">
         <thead>
           <tr>
-            <th>Comment</th>
-            <th width="90px">Date</th>
-            <th width="80px">&nbsp;</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th width="160px">&nbsp;</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in items">
-            <td>
-                <p>
-                    <strong>@{{ item.user.name }}</strong> in <a href="/post/@{{ item.post.post_slug }}" target="_blank">@{{ item.post.post_title }}</a>:
-                </p>
-                <p>
-                    <small>@{{ nl2br(item.comment_body) }}</small>
-                </p>
-                <p v-if='item.deleted_at'>
-                    <span v-if='item.deleted_at' class="label label-warning">Hidden</span>
-                </p>
-            </td>
-            <td>@{{ item.created_at }}</td>
+            <td>@{{ item.name }}</td>
+            <td>@{{ item.email }}</td>
+            <td>@{{ item.role }}</td>
             <td>
               <p class="text-center">
-                <!--button class="btn btn-primary btn-xs" data-toggle="tooltip" title="Edit" @click.prevent="editItem(item)"><span class="glyphicon glyphicon-pencil"></span></button-->
-                <button class="btn btn-danger btn-xs" data-toggle="tooltip" title="Hide / Unhide" @click.prevent="deleteItem(item)"><span class="glyphicon glyphicon-trash"></span></button>
+                <button class="btn btn-primary btn-xs" data-toggle="tooltip" title="Edit" @click.prevent="editItem(item)"><span class="glyphicon glyphicon-pencil"></span></button>
+                <button class="btn btn-danger btn-xs" data-toggle="tooltip" title="Delete" @click.prevent="deleteItem(item)"><span class="glyphicon glyphicon-trash"></span></button>
               </p>
             </td>
           </tr>
@@ -89,11 +81,29 @@
               <span class="error text-danger">@{{ formErrorsUpdate['_common'] }}</span>
             </p-->
 
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" name="name" class="form-control" v-model="newItem.name" /> <span v-if="formErrors['name']" class="error text-danger">@{{ formErrors['name'] }}</span>
+            </div>
 
             <div class="form-group">
-              <label for="comment_body">Comment Body:</label>
-              <textarea name="comment_body" class="form-control" v-model="newItem.comment_body"></textarea>
-              <span v-if="formErrors['comment_body']" class="error text-danger">@{{ formErrors['comment_body'] }}</span>
+              <label for="email">Email:</label>
+              <input type="text" name="email" class="form-control" v-model="newItem.email" /> <span v-if="formErrors['email']" class="error text-danger">@{{ formErrors['email'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="role">Role:</label>
+              <select v-model="newItem.role" class="form-control" name="role">
+                <option v-for="option in roleOptions" v-bind:value="option.value">
+                  @{{ option.text }}
+                </option>
+              </select>
+              <span v-if="formErrors['role']" class="error text-danger">@{{ formErrors['role'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input type="text" name="password" class="form-control" v-model="newItem.password" /> <span v-if="formErrors['password']" class="error text-danger">@{{ formErrors['password'] }}</span>
             </div>
 
             <div class="form-group">
@@ -122,9 +132,28 @@
             </p-->
 
             <div class="form-group">
-              <label for="comment_body">Post Body:</label>
-              <textarea name="comment_body" class="form-control" v-model="fillItem.comment_body"></textarea>
-              <span v-if="formErrorsUpdate['comment_body']" class="error text-danger">@{{ formErrorsUpdate['comment_body'] }}</span>
+              <label for="name">Name:</label>
+              <input type="text" name="name" class="form-control" v-model="fillItem.name" /> <span v-if="formErrorsUpdate['name']" class="error text-danger">@{{ formErrorsUpdate['name'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="text" name="email" class="form-control" v-model="fillItem.email" /> <span v-if="formErrorsUpdate['email']" class="error text-danger">@{{ formErrorsUpdate['email'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="role">Role:</label>
+              <select v-model="fillItem.role" class="form-control" name="role">
+                <option v-for="option in roleOptions" v-bind:value="option.value">
+                  @{{ option.text }}
+                </option>
+              </select>
+              <span v-if="formErrorsUpdate['role']" class="error text-danger">@{{ formErrorsUpdate['role'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password (leave blank for no change):</label>
+              <input type="text" name="password" class="form-control" v-model="fillItem.password" /> <span v-if="formErrorsUpdate['password']" class="error text-danger">@{{ formErrorsUpdate['password'] }}</span>
             </div>
 
             <div class="form-group">
@@ -139,8 +168,8 @@
 
 @push('scripts')
 $(document).ready(function(){
-  window._managers.commentsManager
-    && window._managers.commentsManager();
+  window._managers.usersManager
+    && window._managers.usersManager();
 });
 @endpush
 

@@ -2,28 +2,22 @@
 
 Latest Laravel blog boilerplate starter kit application. A very basic set of features for easy start developing a new application. Education purposes only.
 
-# Features
+## Features
 
 * Laravel
-* MySQL migrations
-* Bootstrap, jQuery
-* Users, auth and roles, gates and policies
+* MySQL migrations and seeds
+* Bootstrap, jQuery, and vue.js
+* Users, auth, and roles
 * User profile page and avatar upload
-* Posts, comments, users CRUD
+* Posts, comments, and users CRUDs
 
-# ToDo
-
-- [ ] Beautiful users, posts, comments CRUD with AJAX
-- [ ] Unit testing
-
-
-# Pre-requisites
+## Pre-requisites
 
  * npm
  * composer
  * gulp
 
-# Install
+## Install
 
 ```bash
 # get it
@@ -49,6 +43,17 @@ $ gulp watch
 $ php artisan serve
 ```
 
-# Notes
+## Notes
 
 We will try to keep this up-to-date. At the moment of writing, the latest Laravel version is 5.4.
+
+## ToDo
+
+- [ ] Release for Laravel 5.4
+- [ ] Unit testing (karma, phpUnit, Behat)
+- [ ] Feature: search field for all lists
+- [ ] Feature: hard delete for all views (invoking MySQL transactions)
+- [ ] Minor: pagination last and first page when available
+- [ ] Workflow Tutorial
+- [ ] Desirable: React/Redux branch
+- [ ] Desirable: Bootstrap 4 + admin theme

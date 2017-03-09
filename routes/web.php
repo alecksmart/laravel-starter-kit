@@ -13,21 +13,34 @@ use \App\Post;
 |
 */
 
+// General display
 Route::get('/', 'BlogController@index');
-
 Auth::routes();
+Route::get('/dashboard', 'DashboardController@index');
 
-Route::get('/home', 'HomeController@index');
-
+// Display single post
 Route::get('/post/{post_slug}', [
      'post_slug' => 'post_slug',
-     'uses'     => 'PostsController@show'
+     'uses'     => 'BlogController@show'
 ]);
-Route::patch('/posts/unhide', 'PostsController@unhide');
-Route::patch('/posts/approve', 'PostsController@approve');
-Route::resource('posts', 'PostsController');
-Route::patch('/comments/unhide', 'CommentsController@unhide');
-Route::resource('comments', 'CommentsController');
+// Create new blog post
+Route::post('/post/create', 'BlogController@createPost');
+// Create new comment
+Route::post('/comment/create', 'BlogController@createComment');
+
+// User account related
 Route::get('/myaccount', 'UsersController@account');
 Route::post('/myaccount', 'UsersController@save');
 Route::post('/user/avatar', 'UsersController@avatar');
+
+// Manage usesrs
+Route::get('/manage/users/list', 'UserManagerController@list');
+Route::resource('/manage/users', 'UserManagerController');
+
+// Manage posts
+Route::get('/manage/posts/list', 'PostsManagerController@list');
+Route::resource('/manage/posts', 'PostsManagerController');
+
+// Manage comments
+Route::get('/manage/comments/list', 'CommentsManagerController@list');
+Route::resource('/manage/comments', 'CommentsManagerController');

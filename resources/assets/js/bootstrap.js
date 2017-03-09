@@ -7,7 +7,6 @@ window._ = require('lodash');
  */
 
 window.$ = window.jQuery = require('jquery');
-
 require('bootstrap-sass');
 
 /**
@@ -16,7 +15,14 @@ require('bootstrap-sass');
  * and simple, leaving you to focus on building your next great project.
  */
 
-// window.Vue = require('vue');
+window.Vue = require('vue');
+
+/**
+ * We will need Vue's $http...
+ */
+require('vue-resource');
+window.Vue.http.headers.common['X-CSRF-TOKEN'] = window.Laravel.csrfToken;
+window.Vue.http.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -24,12 +30,12 @@ require('bootstrap-sass');
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
-window.axios = require('axios');
+/*window.axios = require('axios');
 
 window.axios.defaults.headers.common = {
   'X-CSRF-TOKEN': window.Laravel.csrfToken,
   'X-Requested-With': 'XMLHttpRequest'
-};
+};*/
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
@@ -43,3 +49,5 @@ window.axios.defaults.headers.common = {
 //     broadcaster: 'pusher',
 //     key: 'your-pusher-key'
 // });
+
+window._managers = {};

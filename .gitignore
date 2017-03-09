@@ -5,6 +5,8 @@ public/build
 public/storage
 public/images
 public/hot
+public/js/app.js
+public/js/app.js.map
 storage/*.key
 .idea
 Homestead.json
