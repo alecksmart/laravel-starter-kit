@@ -101,7 +101,7 @@ class PostsManagerController extends Controller
      */
     public function update(Slug $slug, Request $request, $id)
     {
-        if (Gate::denies('manage-users-update')) {
+        if (Gate::denies('manage-posts')) {
             abort(403, 'Unauthorized action');
         }
 
@@ -129,7 +129,7 @@ class PostsManagerController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        if (Gate::denies('manage-users-delete')) {
+        if (Gate::denies('manage-posts')) {
             abort(403, 'Unauthorized action');
         }
 

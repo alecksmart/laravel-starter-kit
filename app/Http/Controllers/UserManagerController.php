@@ -117,7 +117,14 @@ class UserManagerController extends Controller
         }
         $this->validate($request, $rules);
 
-        $user->update($request->all());
+        $update = [
+            'name'     => $request->get('name'),
+            'email'    => $request->get('email'),
+            'role'     => $request->get('role'),
+            'password' => bcrypt($request->get('password')),
+        ];
+
+        $user->update($update);
         return response()->json($user);
     }
 
