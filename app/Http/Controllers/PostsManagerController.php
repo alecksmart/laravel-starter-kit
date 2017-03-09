@@ -107,23 +107,16 @@ class PostsManagerController extends Controller
 
         $post = Post::withTrashed()->find($id);
 
-        $this->validate($request, [
+        $rules = [
             'post_title' => 'required|max:255',
             'post_body' => 'required',
-        ]);
-
+        ];
         $this->validate($request, $rules);
 
-        /*$post->post_title  = $request->get('post_title');
+        $post->post_title  = $request->get('post_title');
         $post->post_slug   = $slug->createSlug($request->get('post_title'));
         $post->post_body   = $request->get('post_body');
-        $post->is_approved = $request->get('is_approved');*/
-
-        $post->update([
-            'post_title'  => $request->get('post_title'),
-            'post_slug'   => $slug->createSlug($request->get('post_title')),
-            'post_body'   => $request->get('post_body')
-        ]);
+        $post->update();
 
         return response()->json($post);
     }
@@ -141,7 +134,7 @@ class PostsManagerController extends Controller
         }
 
         $post = Post::withTrashed()->find($id);
-        $post->delete();
+        $post->trashed() ? $post->restore() : $post->delete();
         return response()->json(['done']);
     }
 }

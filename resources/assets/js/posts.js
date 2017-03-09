@@ -81,7 +81,7 @@ window._managers.postsManager = () => {
         }
         this.$http.delete('/manage/posts/' + item.id).then((response) => {
           this.changePage(this.pagination.current_page);
-          toastr.success('Item Deleted Successfully.', 'Success Alert', {
+          toastr.success('Operation Successful.', 'Success Alert', {
             timeOut: 5000
           });
         }, (response) => {

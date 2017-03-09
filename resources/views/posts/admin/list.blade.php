@@ -36,12 +36,18 @@
         </thead>
         <tbody>
           <tr v-for="item in items">
-            <td><strong>@{{ item.post_title }}</strong></td>
+            <td>
+                <strong>@{{ item.post_title }}</strong>
+                <p v-if='item.deleted_at || !item.is_approved'>
+                    <span v-if='item.deleted_at' class="label label-warning">Hidden</span>
+                    <span v-if='!item.is_approved' class="label label-warning">Not approved</span>
+                </p>
+            </td>
             <td>@{{ item.created_at }}</td>
             <td>
               <p class="text-center">
-                <button class="btn btn-primary btn-xs" data-title="Edit" @click.prevent="editItem(item)"><span class="glyphicon glyphicon-pencil"></span></button>
-                <button class="btn btn-danger btn-xs" data-title="Delete" @click.prevent="deleteItem(item)"><span class="glyphicon glyphicon-trash"></span></button>
+                <button class="btn btn-primary btn-xs" data-toggle="tooltip" title="Edit" @click.prevent="editItem(item)"><span class="glyphicon glyphicon-pencil"></span></button>
+                <button class="btn btn-danger btn-xs" data-toggle="tooltip" title="Hide / Unhide" @click.prevent="deleteItem(item)"><span class="glyphicon glyphicon-trash"></span></button>
               </p>
             </td>
           </tr>
@@ -121,9 +127,9 @@
             </div>
 
             <div class="form-group">
-              <label for="post_title">Post Body:</label>
-              <textarea name="post_title" class="form-control" v-model="fillItem.post_title"></textarea>
-              <span v-if="formErrorsUpdate['post_title']" class="error text-danger">@{{ formErrorsUpdate['post_title'] }}</span>
+              <label for="post_body">Post Body:</label>
+              <textarea name="post_body" class="form-control" v-model="fillItem.post_body"></textarea>
+              <span v-if="formErrorsUpdate['post_body']" class="error text-danger">@{{ formErrorsUpdate['post_body'] }}</span>
             </div>
 
             <div class="form-group">

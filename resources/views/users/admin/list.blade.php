@@ -42,8 +42,8 @@
             <td>@{{ item.role }}</td>
             <td>
               <p class="text-center">
-                <button class="btn btn-primary btn-xs" data-title="Edit" @click.prevent="editItem(item)"><span class="glyphicon glyphicon-pencil"></span></button>
-                <button class="btn btn-danger btn-xs" data-title="Delete" @click.prevent="deleteItem(item)"><span class="glyphicon glyphicon-trash"></span></button>
+                <button class="btn btn-primary btn-xs" data-toggle="tooltip" title="Edit" @click.prevent="editItem(item)"><span class="glyphicon glyphicon-pencil"></span></button>
+                <button class="btn btn-danger btn-xs" data-toggle="tooltip" title="Delete" @click.prevent="deleteItem(item)"><span class="glyphicon glyphicon-trash"></span></button>
               </p>
             </td>
           </tr>
