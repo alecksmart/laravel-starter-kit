@@ -2,14 +2,16 @@
 
 @section('content')
 
-<div class="container" id="manage-vue">
-  <div class="row">
-    <div class="col-lg-12 margin-tb">
-      <div class="pull-left">
-        <h2>Manage Users</h2>
+  <div class="container" id="manage-vue">
+    <div class="row">
+      <div class="col-lg-12 margin-tb">
+        <div class="pull-left">
+          <h2>Manage Users</h2>
+        </div>
       </div>
     </div>
-  </div>
+
+  <div class="help-block"></div>
 
   <!-- New Item Controls  -->
 
