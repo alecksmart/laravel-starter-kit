@@ -28,6 +28,10 @@
     <ul class="pagination"> {{ $posts->links() }} </ul>
 
   </div>
+
+
+  @can('post-create')
+
   <div class="container">
     <div class="row">
       <div class="col-md-8">
@@ -40,7 +44,10 @@
             <div class="alert alert-danger"> {{ $error }} </div>
         @endforeach
 
-        {{ Form::open(array('url' => '/posts')) }} {{ Form::token() }}
+        {{ Form::open(array('url' => '/posts')) }}
+
+        {{ Form::token() }}
+
         <div class="form-group">
             {{ Form::label('Post Title*') }}
             {{ Form::text('post_title', null, array('required', 'class'=>'form-control', 'placeholder'=>'Post title')) }}
@@ -54,8 +61,11 @@
         </div>
         {{ Form::close() }}
 
-        </div>
+      </div>
     </div>
   </div>
 
-  @endsection
+  @endcan
+
+</div>
+@endsection
