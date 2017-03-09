@@ -24,7 +24,8 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 $ git clone https://github.com/alecksmart/laravel-starter-kit.git
 # edit config
 $ cd laravel-starter-kit
-$ mkdir -p bootstrap/cache/
+$ mkdir -p bootstrap/cache
+$ mkdir -p public/images/avatars
 $ vim config/database.php
 $ cp .env.example .env
 $ vim .env
