@@ -37,9 +37,10 @@ Route::post('/user/avatar', 'UsersController@avatar');
 Route::get('/manage/users/list', 'UserManagerController@list');
 Route::resource('/manage/users', 'UserManagerController');
 
+// Manage posts
+Route::get('/manage/posts/list', 'PostsManagerController@list');
+Route::resource('/manage/posts', 'PostsManagerController');
 
-//Route::patch('/posts/unhide', 'PostsController@unhide');
-//Route::patch('/posts/approve', 'PostsController@approve');
-//Route::resource('posts', 'PostsController');
-//Route::patch('/comments/unhide', 'CommentsController@unhide');
-//Route::resource('comments', 'CommentsController');
+// Manage comments
+Route::get('/manage/comments/list', 'CommentsManagerController@list');
+Route::resource('/manage/comments', 'CommentsManagerController');

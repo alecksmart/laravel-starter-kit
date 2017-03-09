@@ -3,9 +3,13 @@
   @can('manage-users-list')
     <li><a href="/manage/users/list">Manage Users</a></li>
   @endcan
+  @can('manage-posts')
+    <li><a href="/manage/posts/list">Manage Posts</a></li>
+  @endcan
+  @can('manage-comments')
+    <li><a href="/manage/comments/list">Manage Comments</a></li>
+  @endcan
   <li><a href="/myaccount">My Account</a></li>
-  <!--li><a href="/posts">List of Posts</a></li>
-    <li><a href="/comments">List of Comments</a></li-->
   <li> <a href="{{ route('logout') }}" onclick="event.preventDefault();
                       document.getElementById('logout-form').submit();">
             Logout
