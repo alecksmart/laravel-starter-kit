@@ -1,5 +1,5 @@
 <ul class="dropdown-menu" role="menu">
-  <li><a href="/home">Dashboard</a></li>
+  <li><a href="/dashboard">Dashboard</a></li>
   @can('manage-users-list')
     <li><a href="/manage/users/list">Manage Users</a></li>
   @endcan
