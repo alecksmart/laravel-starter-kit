@@ -54,6 +54,7 @@ We will try to keep this up-to-date. At the moment of writing, the latest Larave
 - [ ] Feature: search field for all lists
 - [ ] Feature: hard delete for all views (invoking MySQL transactions)
 - [ ] Minor: pagination last and first page when available
+- [ ] Minor: modal pop-ups for creating posts and comments
 - [ ] Workflow Tutorial
 - [ ] Desirable: React/Redux branch
 - [ ] Desirable: Bootstrap 4 + admin theme
