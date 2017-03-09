@@ -16,7 +16,7 @@ use \App\Post;
 // General display
 Route::get('/', 'BlogController@index');
 Auth::routes();
-Route::get('/home', 'HomeController@index');
+Route::get('/home', 'DashboardController@index');
 
 // Display single post
 Route::get('/post/{post_slug}', [
