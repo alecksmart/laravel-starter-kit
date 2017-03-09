@@ -28,8 +28,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        /**--------------------------------------
-         * Users permissions
+        /**
+         * --------------------------------------
+         *   Users permissions
          * --------------------------------------
         */
 
