@@ -20,6 +20,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 - [ ] Minor: pagination last and first page when available
 - [ ] Workflow Tutorial
 - [ ] Possibly: React/Redux branch
+- [ ] Possibly: Bootstrap 4 + admin theme
 
 # Pre-requisites
 
