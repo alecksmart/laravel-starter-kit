@@ -1,6 +1,8 @@
+/**
+ * @todo load on demand for the page from blade stack
+ */
 const toastr = require('toastr');
-
-window._managers.commentsManager = () => {
+window._managers.usersManager = () => {
   new Vue({
     el: '#manage-vue',
     data: {
@@ -16,9 +18,26 @@ window._managers.commentsManager = () => {
       formErrors: {},
       formErrorsUpdate: {},
       newItem: {
-        'comment_body': ''
+        'name': '',
+        'email': '',
+        'role': 'user',
+        'password': ''
       },
-      fillItem: {}
+      fillItem: {},
+      roleOptions: [
+        {
+          text: 'Administrator',
+          value: 'admin'
+        },
+        {
+          text: 'Moderator',
+          value: 'moderator'
+        },
+        {
+          text: 'User',
+          value: 'user'
+        }
+    ]
     },
     computed: {
       isActived: function () {
@@ -49,7 +68,7 @@ window._managers.commentsManager = () => {
     },
     methods: {
       getVueItems: function (page) {
-        this.$http.get('/manage/comments?page=' + page).then((response) => {
+        this.$http.get('/manage/users?page=' + page).then((response) => {
           this.$set('items', response.data.data.data);
           this.$set('pagination', response.data.pagination);
         });
@@ -57,10 +76,13 @@ window._managers.commentsManager = () => {
       createItem: function () {
         var input = this.newItem;
         this.formErrors = {};
-        this.$http.post('/manage/comments', input).then((response) => {
+        this.$http.post('/manage/users', input).then((response) => {
           this.changePage(this.pagination.current_page);
           this.newItem = {
-            'comment_body': ''
+            'name': '',
+            'email': '',
+            'role': 'user',
+            'password': ''
           };
           $("#create-item").modal('hide');
           toastr.success('Item Created Successfully.', 'Success Alert', {
@@ -77,9 +99,9 @@ window._managers.commentsManager = () => {
         if (!confirm('Are you sure?')) {
           return false;
         }
-        this.$http.delete('/manage/comments/' + item.id).then((response) => {
+        this.$http.delete('/manage/users/' + item.id).then((response) => {
           this.changePage(this.pagination.current_page);
-          toastr.success('Operation Successful.', 'Success Alert', {
+          toastr.success('Item Deleted Successfully.', 'Success Alert', {
             timeOut: 5000
           });
         }, (response) => {
@@ -92,15 +114,21 @@ window._managers.commentsManager = () => {
         this.fillItem = {};
         this.formErrorsUpdate = {};
         this.fillItem.id = item.id;
-        this.fillItem.comment_body = item.comment_body;
+        this.fillItem.name = item.name;
+        this.fillItem.email = item.email;
+        this.fillItem.role = item.role;
+        this.fillItem.password = item.password;
         $("#edit-item").modal('show');
       },
       updateItem: function (id) {
         var input = this.fillItem;
-        this.$http.put('/manage/comments/' + id, input).then((response) => {
+        this.$http.put('/manage/users/' + id, input).then((response) => {
           this.changePage(this.pagination.current_page);
           this.fillItem = {
-            'comment_body': ''
+            'id': '',
+            'name': '',
+            'email': '',
+            'password': ''
           };
           $("#edit-item").modal('hide');
           toastr.success('Item Updated Successfully.', 'Success Alert', {
@@ -116,9 +144,6 @@ window._managers.commentsManager = () => {
       changePage: function (page) {
         this.pagination.current_page = page;
         this.getVueItems(page);
-      },
-      nl2br : function(txt){
-        return txt.replace(/\n/g,"<br>");
       }
     }
   });
