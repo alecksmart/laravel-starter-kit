@@ -32,6 +32,7 @@ class AuthServiceProvider extends ServiceProvider
          * Users permissions
          * --------------------------------------
         */
+
         // Admins can manage users list
         Gate::define('manage-users-list', function ($user) {
             return $user->role === 'admin';

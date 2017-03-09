@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,6 +24,9 @@ class UserManagerController extends Controller
      */
     public function list()
     {
+        if (Gate::denies('manage-users-list')) {
+            abort(403, 'Unauthorized action');
+        }
         return view('users.admin.list');
     }
 
@@ -33,6 +37,10 @@ class UserManagerController extends Controller
      */
     public function index()
     {
+        if (Gate::denies('manage-users-list')) {
+            abort(403, 'Unauthorized action');
+        }
+
         $items = User::latest()->paginate(5);
 
         $response = [
@@ -58,6 +66,10 @@ class UserManagerController extends Controller
      */
     public function store(Request $request)
     {
+        if (Gate::denies('manage-users-create')) {
+            abort(403, 'Unauthorized action');
+        }
+
         $this->validate($request, [
             'name'     => 'required|max:100',
             'email'    => 'required|max:100|email|unique:users',
@@ -77,10 +89,13 @@ class UserManagerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $currentUser = $request->user();
+        if (Gate::denies('manage-users-update')) {
+            abort(403, 'Unauthorized action');
+        }
+
         $user = User::find($id);
 
-        if ($currentUser->id == $user->id) {
+        if ($request->user()->id == $user->id) {
             // 403 - unauthorized action
             return response()->json(['_common' => ['You cannot edit yourself, period.']], 403);
         }
@@ -88,6 +103,7 @@ class UserManagerController extends Controller
         $rules = [
             'name'     => 'required|max:100'
         ];
+
         // validate email change
         if ($request->get('email') !== $user->email) {
             $rules['email'] = 'required|max:100|email|unique:users';
@@ -110,10 +126,13 @@ class UserManagerController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $currentUser = $request->user();
+        if (Gate::denies('manage-users-delete')) {
+            abort(403, 'Unauthorized action');
+        }
+
         $user = User::find($id);
 
-        if ($currentUser->id == $user->id) {
+        if ($request->user()->id == $user->id) {
             // 403 - unauthorized action
             return response()->json(['_common' => ['You cannot edit yourself, period.']], 403);
         }
