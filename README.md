@@ -15,7 +15,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 
 - [ ] Release for Laravel 5.4
 - [ ] Unit testing
-- [ ] Tutorial
+- [ ] Workflow Tutorial
 
 # Pre-requisites
 
