@@ -77,11 +77,11 @@ class PostsController extends Controller
         ]);
 
         $post = new Post();
-            $post->user_id = $user->id;
-            $post->post_title = $request->get('post_title');
-            $post->post_slug = $slug->createSlug($request->get('post_title'));
-            $post->post_body = $request->get('post_body');
-            $post->created_at = new \DateTime();
+        $post->user_id = $user->id;
+        $post->post_title = $request->get('post_title');
+        $post->post_slug = $slug->createSlug($request->get('post_title'));
+        $post->post_body = $request->get('post_body');
+        $post->created_at = new \DateTime();
         $post->save();
 
         return redirect('/');
@@ -130,7 +130,6 @@ class PostsController extends Controller
      */
     public function update(Request $request, Post $post, Slug $slug)
     {
-
         if (!Auth::check()) {
             abort(404);
         }
@@ -182,7 +181,6 @@ class PostsController extends Controller
      */
     public function destroy(Post $post, Request $request)
     {
-
         if (!Auth::check()) {
             abort(404);
         }
@@ -220,7 +218,6 @@ class PostsController extends Controller
      */
     public function unhide(Request $request)
     {
-
         if (!Auth::check()) {
             abort(404);
         }
@@ -261,7 +258,6 @@ class PostsController extends Controller
      */
     public function approve(Request $request, Post $post)
     {
-
         if (!Auth::check()) {
             abort(404);
         }

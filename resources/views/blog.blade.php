@@ -44,7 +44,7 @@
             <div class="alert alert-danger"> {{ $error }} </div>
         @endforeach
 
-        {{ Form::open(array('url' => '/posts')) }}
+        {{ Form::open(array('url' => '/post/create')) }}
 
         {{ Form::token() }}
 

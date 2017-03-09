@@ -65,7 +65,7 @@
         </div>
       @endforeach
 
-      {{ Form::open(array('url' => '/comments')) }}
+      {{ Form::open(array('url' => '/comment/create')) }}
 
         {{ Form::token() }}
 

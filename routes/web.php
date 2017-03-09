@@ -15,18 +15,25 @@ use \App\Post;
 
 // General display
 Route::get('/', 'BlogController@index');
-Route::get('/home', 'HomeController@index');
 Auth::routes();
+Route::get('/home', 'HomeController@index');
+
+// Display single post
 Route::get('/post/{post_slug}', [
      'post_slug' => 'post_slug',
-     'uses'     => 'PostsController@show'
+     'uses'     => 'BlogController@show'
 ]);
-// User-related
+// Create new blog post
+Route::post('/post/create', 'BlogController@createPost');
+// Create new comment
+Route::post('/comment/create', 'BlogController@createComment');
+
+// User account related
 Route::get('/myaccount', 'UsersController@account');
 Route::post('/myaccount', 'UsersController@save');
 Route::post('/user/avatar', 'UsersController@avatar');
 
-// Manage usesr
+// Manage usesrs
 Route::get('/manage/users/list', 'UserManagerController@list');
 Route::resource('/manage/users', 'UserManagerController');
 
