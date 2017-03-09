@@ -30,6 +30,38 @@ class AuthServiceProvider extends ServiceProvider
 
         /**
          * --------------------------------------
+         *   Comments permissions
+         * --------------------------------------
+        */
+
+        // All users can comment
+        Gate::define('comment-create', function ($user) {
+            return $user->id > 0;
+        });
+
+        // Moderators and admins can manage comments
+        Gate::define('manage-comments', function ($user) {
+            return in_array($user->role, ['moderator', 'admin']);
+        });
+
+        /**
+         * --------------------------------------
+         *   Posts permissions
+         * --------------------------------------
+        */
+
+        // All users can post
+        Gate::define('post-create', function ($user) {
+            return $user->id > 0;
+        });
+
+        // Moderators and admins can manage posts
+        Gate::define('manage-posts', function ($user) {
+            return in_array($user->role, ['moderator', 'admin']);
+        });
+
+        /**
+         * --------------------------------------
          *   Users permissions
          * --------------------------------------
         */
