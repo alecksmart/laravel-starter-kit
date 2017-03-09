@@ -19,6 +19,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 - [ ] Feature: hard delete for all views (invoking MySQL transactions)
 - [ ] Minor: pagination last and first page when available
 - [ ] Workflow Tutorial
+- [ ] Possibly: React/Redux branch
 
 # Pre-requisites
 
