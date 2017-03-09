@@ -11,17 +11,6 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 * User profile page and avatar upload
 * Posts, comments, and users CRUDs
 
-# ToDo
-
-- [ ] Release for Laravel 5.4
-- [ ] Unit testing (karma, phpUnit, Behat)
-- [ ] Feature: search field for all lists
-- [ ] Feature: hard delete for all views (invoking MySQL transactions)
-- [ ] Minor: pagination last and first page when available
-- [ ] Workflow Tutorial
-- [ ] Desirable: React/Redux branch
-- [ ] Desirable: Bootstrap 4 + admin theme
-
 # Pre-requisites
 
  * npm
@@ -57,3 +46,14 @@ $ php artisan serve
 # Notes
 
 We will try to keep this up-to-date. At the moment of writing, the latest Laravel version is 5.4.
+
+# ToDo
+
+- [ ] Release for Laravel 5.4
+- [ ] Unit testing (karma, phpUnit, Behat)
+- [ ] Feature: search field for all lists
+- [ ] Feature: hard delete for all views (invoking MySQL transactions)
+- [ ] Minor: pagination last and first page when available
+- [ ] Workflow Tutorial
+- [ ] Desirable: React/Redux branch
+- [ ] Desirable: Bootstrap 4 + admin theme
