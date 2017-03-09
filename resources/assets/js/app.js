@@ -6,5 +6,5 @@
 
 require('./bootstrap');
 require('./users');
-//require('./posts');
-//require('./comments');
+require('./posts');
+require('./comments');

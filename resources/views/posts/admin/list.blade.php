@@ -1,91 +1,146 @@
-@extends('..layouts.app')
+@extends('layouts.app')
 
 @section('content')
 
-<div class="container">
-
-    <div class="searchbox">
-        <div class="form-group">
-            <input type="text" class="form-control" data-url="{{ $baseurl }}" placeholder="Search" id="search-filter" value="{{ $filter }}">
+  <div class="container" id="manage-vue">
+    <div class="row">
+      <div class="col-lg-12 margin-tb">
+        <div class="pull-left">
+          <h2>Manage Posts</h2>
         </div>
+      </div>
     </div>
 
-    <h1>Edit Posts</h1>
+  <div class="help-block"></div>
 
-    <div class="posts">
-        <div class="container">
-            @foreach ($posts as $post)
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <div class="pull-right">Latest changes:
-                          <strong> {{ $post->updated_at ? $post->updated_at->format('F d, Y H:i') : $post->created_at->format('F d, Y H:i') }} </strong>
-                        </div>
-                        <h4><a href="/post/{{ $post->post_slug }}" target="_blank" title="See the full posting with comments">{{ $post->post_title }}</a></h4>
-                        <p>by <em>{{ $post->user->name }}</em>, <a href="mailto:{{ $post->user->email }}">{{ $post->user->email }}</a>:</p>
-                        <p>
-                        @if ($post->trashed())
-                            <span class="label label-warning">Hidden</span>
-                        @endif
-                        @if (!$post->is_approved)
-                            <span class="label label-warning">Not approved</span>
-                        @endif
-                        </p>
-                    </div>
-                    <div class="panel-body">
-                        <div class="pull-right">
-                           <div class="dropdown">
-                              <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Actions
-                              <span class="caret"></span></button>
-                              <ul class="dropdown-menu">
-                                    @if (!$post->trashed())
-                                        @if (!$post->is_approved)
-                                            <li><a href="#" class="admin-post-approve" data-id="{{ $post->id }}" data-pageid="{{ $posts->currentPage() }}">Approve</a></li>
-                                        @else
-                                            <li><a href="#" class="admin-post-unapprove" data-id="{{ $post->id }}" data-pageid="{{ $posts->currentPage() }}">Unapprove</a></li>
-                                        @endif
-                                        <li><a href="#" class="admin-post-edit" data-id="{{ $post->id }}" data-pageid="{{ $posts->currentPage() }}">Edit</a></li>
-                                        <li><a href="#" class="admin-post-hide" data-id="{{ $post->id }}" data-pageid="{{ $posts->currentPage() }}">Hide</a></li>
-                                        <li><a href="#" class="admin-post-delete" data-id="{{ $post->id }}" data-pageid="{{ $posts->currentPage() }}">Delete</a></li>
-                                    @else
-                                        <li><a href="#" class="admin-post-unhide" data-id="{{ $post->id }}" data-pageid="{{ $posts->currentPage() }}">Unhide</a></li>
-                                        <li><a href="#" class="admin-post-deletehidden" data-id="{{ $post->id }}" data-pageid="{{ $posts->currentPage() }}">Delete</a></li>
-                                    @endif
-                              </ul>
-                            </div>
-                        </div>
-                        <p>
-                            {{ nl2br($post->post_body) }}
-                        </p>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+  <!-- New Item Controls  -->
 
-      <ul class="pagination">
-          {{ $posts->links() }}
-      </ul>
+  <div class="pull-right">
+    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#create-item"><span class="glyphicon glyphicon-new-window"></span> New </button>
+  </div>
+
+  <!-- Item Listing -->
+
+  <div class="card">
+    <div class="card-header"><i class="fa fa-align-justify"></i>
+      List of Posts
+    </div>
+    <div class="card-block">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th width="160px">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in items">
+            <td><strong>@{{ item.post_title }}</strong></td>
+            <td>@{{ item.created_at }}</td>
+            <td>
+              <p class="text-center">
+                <button class="btn btn-primary btn-xs" data-title="Edit" @click.prevent="editItem(item)"><span class="glyphicon glyphicon-pencil"></span></button>
+                <button class="btn btn-danger btn-xs" data-title="Delete" @click.prevent="deleteItem(item)"><span class="glyphicon glyphicon-trash"></span></button>
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <nav>
+        <ul class="pagination">
+          <li v-if="pagination.current_page > 1">
+            <a href="#" aria-label="Previous" @click.prevent="changePage(pagination.current_page - 1)"> <span aria-hidden="true">«</span> </a>
+          </li>
+          <li v-for="page in pagesNumber" v-bind:class="[ page == isActived ? 'active' : '']"> <a href="#" @click.prevent="changePage(page)">@{{ page }}</a>
+          </li>
+          <li v-if="pagination.current_page < pagination.last_page">
+            <a href="#" aria-label="Next" @click.prevent="changePage(pagination.current_page + 1)"> <span aria-hidden="true">»</span> </a>
+          </li>
+        </ul>
+      </nav>
 
     </div>
+  </div>
+
+  <!-- Create Item Modal -->
+  <div class="modal fade" id="create-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <h4 class="modal-title" id="myModalLabel">Create New</h4> </div>
+        <div class="modal-body">
+          <form method="POST" enctype="multipart/form-data" v-on:submit.prevent="createItem">
+
+            <!--p v-if="formErrorsUpdate['_common']">
+              <span class="error text-danger">@{{ formErrorsUpdate['_common'] }}</span>
+            </p-->
+
+            <div class="form-group">
+              <label for="post_title">Title:</label>
+              <input type="text" name="post_title" class="form-control" v-model="newItem.post_title" /> <span v-if="formErrors['post_title']" class="error text-danger">@{{ formErrors['post_title'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="post_body">Post Body:</label>
+              <textarea name="post_body" class="form-control" v-model="newItem.post_body"></textarea>
+              <span v-if="formErrors['post_body']" class="error text-danger">@{{ formErrors['post_body'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Item Modal -->
+  <div class="modal fade" id="edit-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <h4 class="modal-title" id="myModalLabel">Edit</h4> </div>
+
+        <div class="modal-body">
+          <form method="POST" enctype="multipart/form-data" v-on:submit.prevent="updateItem(fillItem.id)">
+
+            <!--p v-if="formErrorsUpdate['_common']">
+              <span class="error text-danger">@{{ formErrorsUpdate['_common'] }}</span>
+            </p-->
+
+            <div class="form-group">
+              <label for="post_title">Title:</label>
+              <input type="text" name="post_title" class="form-control" v-model="fillItem.post_title" /> <span v-if="formErrorsUpdate['post_title']" class="error text-danger">@{{ formErrorsUpdate['post_title'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="post_title">Post Body:</label>
+              <textarea name="post_title" class="form-control" v-model="fillItem.post_title"></textarea>
+              <span v-if="formErrorsUpdate['post_title']" class="error text-danger">@{{ formErrorsUpdate['post_title'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div id="admin-post-edit-modal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Edit Post</h4>
-            </div>
-            <div class="modal-body">
-                <div class="centered">
-                    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="btn-ok">OK</button>
-            </div>
-        </div>
-    </div>
-</div>
+@push('scripts')
+$(document).ready(function(){
+  window._managers.postsManager
+    && window._managers.postsManager();
+});
+@endpush
 
 @endsection

@@ -1,4 +1,4 @@
-const modalSpinner = '<div class="centered"><i class="fa fa-spinner fa-spin" style="font-size:24px"></i></div>';
+/*const modalSpinner = '<div class="centered"><i class="fa fa-spinner fa-spin" style="font-size:24px"></i></div>';
 
 const commentActions = {
 
@@ -167,4 +167,4 @@ $(document).on('keyup', '#search-filter', function (e)
     return;
   }
   commentActions.filterForm(e, this);
-});
+});*/

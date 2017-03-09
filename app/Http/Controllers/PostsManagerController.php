@@ -114,11 +114,16 @@ class PostsManagerController extends Controller
 
         $this->validate($request, $rules);
 
-        $post->post_title  = $request->get('post_title');
+        /*$post->post_title  = $request->get('post_title');
         $post->post_slug   = $slug->createSlug($request->get('post_title'));
         $post->post_body   = $request->get('post_body');
-        $post->is_approved = $request->get('is_approved');
-        $post->update();
+        $post->is_approved = $request->get('is_approved');*/
+
+        $post->update([
+            'post_title'  => $request->get('post_title'),
+            'post_slug'   => $slug->createSlug($request->get('post_title')),
+            'post_body'   => $request->get('post_body')
+        ]);
 
         return response()->json($post);
     }
