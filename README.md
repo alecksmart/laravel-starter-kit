@@ -5,19 +5,16 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 # Features
 
 * Laravel
-* vue.js
-* MySQL migrations
-* Bootstrap, jQuery
-* Users, auth and roles
+* MySQL migrations and seeds
+* Bootstrap, jQuery, and vue.js
+* Users, auth, and roles
 * User profile page and avatar upload
-* Posts, comments, users CRUD
-* Users CRUD
+* Posts, comments, and users CRUDs
 
 # ToDo
 
 - [ ] Unit testing
 - [ ] Tutorial
-
 
 # Pre-requisites
 
