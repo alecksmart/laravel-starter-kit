@@ -1,9 +1,7 @@
 /**
  * @todo load on demand for the page from blade stack
  */
-
 const toastr = require('toastr');
-
 window._managers.usersManager = () => {
   new Vue({
     el: '#manage-vue',
@@ -20,14 +18,26 @@ window._managers.usersManager = () => {
       formErrors: {},
       formErrorsUpdate: {},
       newItem: {
-        'title': '',
-        'description': ''
+        'name': '',
+        'email': '',
+        'role': 'user',
+        'password': ''
       },
-      fillItem: {
-        'title': '',
-        'description': '',
-        'id': ''
-      }
+      fillItem: {},
+      roleOptions: [
+        {
+          text: 'Administrator',
+          value: 'admin'
+        },
+        {
+          text: 'Moderator',
+          value: 'moderator'
+        },
+        {
+          text: 'User',
+          value: 'user'
+        }
+    ]
     },
     computed: {
       isActived: function () {
@@ -71,6 +81,7 @@ window._managers.usersManager = () => {
           this.newItem = {
             'name': '',
             'email': '',
+            'role': 'user',
             'password': ''
           };
           $("#create-item").modal('hide');
@@ -105,6 +116,7 @@ window._managers.usersManager = () => {
         this.fillItem.id = item.id;
         this.fillItem.name = item.name;
         this.fillItem.email = item.email;
+        this.fillItem.role = item.role;
         this.fillItem.password = item.password;
         $("#edit-item").modal('show');
       },

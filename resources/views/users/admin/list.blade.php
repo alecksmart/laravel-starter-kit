@@ -77,6 +77,10 @@
         <div class="modal-body">
           <form method="POST" enctype="multipart/form-data" v-on:submit.prevent="createItem">
 
+            <!--p v-if="formErrorsUpdate['_common']">
+              <span class="error text-danger">@{{ formErrorsUpdate['_common'] }}</span>
+            </p-->
+
             <div class="form-group">
               <label for="name">Name:</label>
               <input type="text" name="name" class="form-control" v-model="newItem.name" /> <span v-if="formErrors['name']" class="error text-danger">@{{ formErrors['name'] }}</span>
@@ -85,6 +89,16 @@
             <div class="form-group">
               <label for="email">Email:</label>
               <input type="text" name="email" class="form-control" v-model="newItem.email" /> <span v-if="formErrors['email']" class="error text-danger">@{{ formErrors['email'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="role">Role:</label>
+              <select v-model="newItem.role" class="form-control" name="role">
+                <option v-for="option in roleOptions" v-bind:value="option.value">
+                  @{{ option.text }}
+                </option>
+              </select>
+              <span v-if="formErrors['role']" class="error text-danger">@{{ formErrors['role'] }}</span>
             </div>
 
             <div class="form-group">
@@ -113,9 +127,9 @@
         <div class="modal-body">
           <form method="POST" enctype="multipart/form-data" v-on:submit.prevent="updateItem(fillItem.id)">
 
-            <p v-if="formErrorsUpdate['_common']">
+            <!--p v-if="formErrorsUpdate['_common']">
               <span class="error text-danger">@{{ formErrorsUpdate['_common'] }}</span>
-            </p>
+            </p-->
 
             <div class="form-group">
               <label for="name">Name:</label>
@@ -125,6 +139,16 @@
             <div class="form-group">
               <label for="email">Email:</label>
               <input type="text" name="email" class="form-control" v-model="fillItem.email" /> <span v-if="formErrorsUpdate['email']" class="error text-danger">@{{ formErrorsUpdate['email'] }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="role">Role:</label>
+              <select v-model="fillItem.role" class="form-control" name="role">
+                <option v-for="option in roleOptions" v-bind:value="option.value">
+                  @{{ option.text }}
+                </option>
+              </select>
+              <span v-if="formErrorsUpdate['role']" class="error text-danger">@{{ formErrorsUpdate['role'] }}</span>
             </div>
 
             <div class="form-group">

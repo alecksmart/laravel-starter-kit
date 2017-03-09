@@ -73,6 +73,7 @@ class UserManagerController extends Controller
         $this->validate($request, [
             'name'     => 'required|max:100',
             'email'    => 'required|max:100|email|unique:users',
+            'role'     => 'required|in:admin,moderator,user',
             'password' => 'required|max:100',
         ]);
 
@@ -97,11 +98,12 @@ class UserManagerController extends Controller
 
         if ($request->user()->id == $user->id) {
             // 403 - unauthorized action
-            return response()->json(['_common' => ['You cannot edit yourself, period.']], 403);
+            return response()->json(['_common' => ['You cannot edit yourself, period']], 403);
         }
 
         $rules = [
-            'name'     => 'required|max:100'
+            'name'     => 'required|max:100',
+            'role'     => 'required|in:admin,moderator,user',
         ];
 
         // validate email change
@@ -134,7 +136,7 @@ class UserManagerController extends Controller
 
         if ($request->user()->id == $user->id) {
             // 403 - unauthorized action
-            return response()->json(['_common' => ['You cannot edit yourself, period.']], 403);
+            return response()->json(['_common' => ['You cannot edit yourself, period']], 403);
         }
 
         $user->delete();
