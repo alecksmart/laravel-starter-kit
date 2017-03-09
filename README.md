@@ -13,6 +13,7 @@ Latest Laravel blog boilerplate starter kit application. A very basic set of fea
 
 # ToDo
 
+- [ ] Release for Laravel 5.4
 - [ ] Unit testing
 - [ ] Tutorial
 
