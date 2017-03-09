@@ -65,11 +65,13 @@ window._managers.usersManager = () => {
       },
       createItem: function () {
         var input = this.newItem;
+        this.formErrors = {};
         this.$http.post('/manage/users', input).then((response) => {
           this.changePage(this.pagination.current_page);
           this.newItem = {
-            'title': '',
-            'description': ''
+            'name': '',
+            'email': '',
+            'password': ''
           };
           $("#create-item").modal('hide');
           toastr.success('Item Created Successfully.', 'Success Alert', {
@@ -77,6 +79,9 @@ window._managers.usersManager = () => {
           });
         }, (response) => {
           this.formErrors = response.data;
+          response.data['_common'] && toastr.error(response.data['_common'].join('<br>'), 'Error', {
+            timeOut: 5000
+          });
         });
       },
       deleteItem: function (item) {
@@ -119,6 +124,9 @@ window._managers.usersManager = () => {
           });
         }, (response) => {
           this.formErrorsUpdate = response.data;
+          response.data['_common'] && toastr.error(response.data['_common'].join('<br>'), 'Error', {
+            timeOut: 5000
+          });
         });
       },
       changePage: function (page) {
