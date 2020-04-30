@@ -24,7 +24,7 @@
     "eslint": ">=6.3.0",
     "eslint-plugin-babel": "^5.3.0",
     "gulp": "^4.0.2",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "laravel-mix": "^4.1.4",
     "lodash": "^4.17.15",
     "vue": "^2.6.10"
